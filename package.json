@@ -1,0 +1,9 @@
+{
+  "name": "gh",
+  "version": "0.0.1",
+  "description": "Easily generate Open Graph images",
+  "main": "index.js",
+  "repository": "https://github.com/alvarlagerlof/ogimage",
+  "author": "Alvar Lagerlöf",
+  "license": "MIT"
+}
