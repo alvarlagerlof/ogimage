@@ -1,0 +1,26 @@
+{
+  "name": "ogimage",
+  "version": "0.0.1",
+  "description": "Easily generate Open Graph images",
+  "repository": "https://github.com/alvarlagerlof/ogimage",
+  "author": "Alvar Lagerlöf",
+  "license": "MIT",
+  "packageManager": "yarn@3.2.2",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --platform=node --target=node16 --outdir=dist",
+    "dev": "yarn build --watch"
+  },
+  "bin": "dist/index.js",
+  "devDependencies": {
+    "esbuild": "^0.14.49"
+  },
+  "dependencies": {
+    "metascraper-date": "^5.29.15",
+    "metascraper-description": "^5.29.15",
+    "metascraper-image": "^5.29.15",
+    "metascraper-publisher": "^5.29.15",
+    "metascraper-title": "^5.29.15",
+    "puppeteer": "^15.5.0"
+  }
+}

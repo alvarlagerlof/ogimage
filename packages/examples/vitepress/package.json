@@ -1,0 +1,19 @@
+{
+  "name": "vitepress-example",
+  "packageManager": "yarn@3.2.2",
+  "scripts": {
+    "build": "yarn docs:build && ogimage",
+    "dev": "yarn docs:dev",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs"
+  },
+  "dependencies": {
+    "@vueuse/core": "^8.9.4"
+  },
+  "devDependencies": {
+    "ogimage": "*",
+    "vitepress": "^1.0.0-alpha.4",
+    "vue": "^3.2.37"
+  }
+}
