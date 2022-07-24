@@ -1,5 +1,5 @@
 {
-  "name": "gh",
+  "name": "ogimage",
   "version": "0.0.1",
   "description": "Easily generate Open Graph images",
   "main": "index.js",
