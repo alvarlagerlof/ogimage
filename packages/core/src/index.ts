@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { constants } from "node:fs";
-import { readFile, access, readdir } from "node:fs/promises";
+import { readFile, access, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import logSymbols from "log-symbols";
 import chalk from "chalk";
@@ -15,6 +15,7 @@ import puppeteer, { Browser } from "puppeteer";
 
 interface Config {
   buildDir: string;
+  domain: string;
 }
 
 const log = (() => {
@@ -38,7 +39,7 @@ const log = (() => {
     const browser = await startBrowser();
 
     log.info("Looking for html files in", config.buildDir);
-    await walkPath(config.buildDir);
+    await walkPath(config, config.buildDir);
 
     log.info("Stopping browser");
     browser.close();
@@ -54,7 +55,7 @@ function shouldExclude(dirOrFile: string): boolean {
   return exclude;
 }
 
-async function walkPath(basePath: string) {
+async function walkPath(config: Config, basePath: string) {
   if (shouldExclude(basePath)) return;
 
   const pathContent = await readdir(basePath, { withFileTypes: true });
@@ -72,7 +73,7 @@ async function walkPath(basePath: string) {
           const pathString = path.resolve(basePath, file);
 
           const meta = await extractMeta(pathString);
-          await addOgImageTag(pathString);
+          await addOgImageTag(config, pathString);
           await screenshot(meta);
 
           log.success(
@@ -95,7 +96,7 @@ async function walkPath(basePath: string) {
     directories.map((directory) => {
       new Promise<void>(async (resolve, reject) => {
         try {
-          await walkPath(`${basePath}/${directory}`);
+          await walkPath(config, `${basePath}/${directory}`);
           resolve();
         } catch {
           reject();
@@ -133,8 +134,21 @@ async function extractMeta(pathString: string) {
   return await scraper({ url: null, html: content, validateUrl: false });
 }
 
-async function addOgImageTag(pathString: string) {
-  // TODO
+async function addOgImageTag(config: Config, pathString: string) {
+  const content = (await readFile(pathString)).toString();
+  const index = content.indexOf("</head>");
+
+  const imgUrl = `https://${config.domain}/ogimage/${pathString
+    .replace(process.cwd(), "")
+    .replace(config.buildDir, "")
+    .substring(2)
+    .replace(".html", "")}.jpg`;
+
+  const tag = `<meta property="og:image" content=${imgUrl} />`;
+  const newContent =
+    content.slice(0, index) + tag + "\n" + content.slice(index);
+
+  await writeFile(pathString, newContent);
 }
 
 async function screenshot(meta: any) {}
