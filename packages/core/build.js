@@ -19,7 +19,7 @@ build({
   outdir: "dist",
   platform: "node",
   bundle: true,
-  external: ["canvas", "re2", "jsdom", "./xhr-sync-worker.js"],
+  external: ["canvas", "re2", "./xhr-sync-worker.js"],
   // minify: false,
   sourcemap: true,
   target: ["node16"],

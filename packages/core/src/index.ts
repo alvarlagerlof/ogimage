@@ -13,7 +13,8 @@ import metascraperDescription from "metascraper-description";
 import metascraperPublisher from "metascraper-publisher";
 
 // import { startRenderer } from "./do";
-import somefunction from "./someother";
+import somefunction from "./someother.js";
+import puppeteer, { Browser } from "puppeteer";
 
 interface Config {
   buildDir: string;
@@ -39,7 +40,7 @@ const log = (() => {
     const config = JSON.parse(file) as Config;
 
     log.info("Starting browser...");
-    const browser = await startBrowser();
+    const browser: Browser = await startBrowser();
 
     log.info("Looking for html files in", config.buildDir);
     await walkPath(config, config.buildDir);
@@ -110,16 +111,16 @@ async function walkPath(config: Config, basePath: string) {
 }
 
 async function startBrowser() {
-  // try {
-  //   const browser = await puppeteer.launch({
-  //     executablePath: process.env.PUPPETEER_EXEC_PATH,
-  //     headless: true,
-  //   });
-  //   log.success("Started browser");
-  //   return browser;
-  // } catch (e) {
-  //   log.error("Failed to start browser", e.message);
-  // }
+  try {
+    const browser = await puppeteer.launch({
+      executablePath: process.env.PUPPETEER_EXEC_PATH,
+      headless: true,
+    });
+    log.success("Started browser");
+    return browser;
+  } catch (e) {
+    log.error("Failed to start browser", e.message);
+  }
 }
 
 async function extractMeta(pathString: string) {
