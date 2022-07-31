@@ -8,10 +8,8 @@
   "packageManager": "yarn@3.2.2",
   "type": "module",
   "scripts": {
-    "buildold": "esbuild `find . ( -name '*.ts' -o -name '*.tsx' )`--platform=node --target=node16 --outdir=dist",
-    "devold": "yarn build --watch",
-    "build": "node build.js",
-    "dev": "node build.js watch"
+    "build": "npx swc ./src -d dist",
+    "dev": "yarn build --watch"
   },
   "bin": "dist/index.js",
   "files": [
