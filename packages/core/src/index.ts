@@ -13,7 +13,7 @@ import metascraperDescription from "metascraper-description";
 import metascraperPublisher from "metascraper-publisher";
 
 // import { startRenderer } from "./do";
-import somefunction from "./someother.ts";
+import somefunction from "./someother";
 
 interface Config {
   buildDir: string;

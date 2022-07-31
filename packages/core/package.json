@@ -8,12 +8,13 @@
   "packageManager": "yarn@3.2.2",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --platform=node --target=node16 --outdir=dist",
-    "dev": "yarn build --watch"
+    "buildold": "esbuild `find . ( -name '*.ts' -o -name '*.tsx' )`--platform=node --target=node16 --outdir=dist",
+    "devold": "yarn build --watch",
+    "build": "node build.js"
   },
   "bin": "dist/index.js",
   "devDependencies": {
-    "esbuild": "0.14.51"
+    "esbuild": "^0.14.51"
   },
   "dependencies": {
     "metascraper-date": "^5.29.15",
