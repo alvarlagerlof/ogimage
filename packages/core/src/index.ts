@@ -11,11 +11,14 @@ import metascraperImage from "metascraper-image";
 import metascraperDate from "metascraper-date";
 import metascraperDescription from "metascraper-description";
 import metascraperPublisher from "metascraper-publisher";
-import puppeteer, { Browser } from "puppeteer";
+
+// import { startRenderer } from "./do";
+import somefunction from "./someother.ts";
 
 interface Config {
   buildDir: string;
   domain: string;
+  layoutsDir: string;
 }
 
 const log = (() => {
@@ -35,13 +38,13 @@ const log = (() => {
     const file = await readFile("ogimage.json", "utf8");
     const config = JSON.parse(file) as Config;
 
-    log.info("Starting browser");
+    log.info("Starting browser...");
     const browser = await startBrowser();
 
     log.info("Looking for html files in", config.buildDir);
     await walkPath(config, config.buildDir);
 
-    log.info("Stopping browser");
+    log.info("Stopping browser...");
     browser.close();
     log.success("Browser stopped");
   } else {
@@ -74,7 +77,7 @@ async function walkPath(config: Config, basePath: string) {
 
           const meta = await extractMeta(pathString);
           await addOgImageTag(config, pathString);
-          await screenshot(meta);
+          await screenshot(config, meta);
 
           log.success(
             "Done",
@@ -107,17 +110,16 @@ async function walkPath(config: Config, basePath: string) {
 }
 
 async function startBrowser() {
-  try {
-    const browser = await puppeteer.launch({
-      executablePath: process.env.PUPPETEER_EXEC_PATH,
-      headless: true,
-    });
-
-    log.success("Started browser");
-    return browser;
-  } catch (e) {
-    log.error("Failed to start browser", e.message);
-  }
+  // try {
+  //   const browser = await puppeteer.launch({
+  //     executablePath: process.env.PUPPETEER_EXEC_PATH,
+  //     headless: true,
+  //   });
+  //   log.success("Started browser");
+  //   return browser;
+  // } catch (e) {
+  //   log.error("Failed to start browser", e.message);
+  // }
 }
 
 async function extractMeta(pathString: string) {
@@ -151,7 +153,16 @@ async function addOgImageTag(config: Config, pathString: string) {
   await writeFile(pathString, newContent);
 }
 
-async function screenshot(meta: any) {}
+async function screenshot(config: Config, meta: any) {
+  somefunction();
+
+  // await startRenderer({
+  //   framework: { type: "react" },
+  //   projectPath: config.layoutsDir,
+  //   filePathPattern: "",
+  //   port: 6000,
+  // });
+}
 
 function checkFileExists(file) {
   return access(file, constants.F_OK)

@@ -13,7 +13,7 @@
   },
   "bin": "dist/index.js",
   "devDependencies": {
-    "esbuild": "^0.14.49"
+    "esbuild": "0.14.51"
   },
   "dependencies": {
     "metascraper-date": "^5.29.15",
@@ -21,6 +21,6 @@
     "metascraper-image": "^5.29.15",
     "metascraper-publisher": "^5.29.15",
     "metascraper-title": "^5.29.15",
-    "puppeteer": "^15.5.0"
+    "puppeteer": "^15.0.0"
   }
 }
