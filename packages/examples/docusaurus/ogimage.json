@@ -1,5 +1,5 @@
 {
   "buildDir": "build",
-  "domain": "localhost:3000",
+  "domain": "example.com",
   "layoutsDir": "ogimage-layouts"
 }

@@ -1,3 +1,5 @@
 {
-  "buildDir": "_site"
+  "buildDir": "_site",
+  "domain": "example.com",
+  "layoutsDir": "ogimage-layouts"
 }

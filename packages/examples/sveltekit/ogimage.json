@@ -1,3 +1,5 @@
 {
-  "buildDir": ".svelte-kit/output/prerendered/pages"
+  "buildDir": ".svelte-kit/output/prerendered/pages",
+  "domain": "example.com",
+  "layoutsDir": "ogimage-layouts"
 }

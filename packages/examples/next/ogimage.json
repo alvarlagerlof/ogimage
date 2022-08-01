@@ -1,3 +1,5 @@
 {
-  "buildDir": ".next/server/pages"
+  "buildDir": ".next/server/pages",
+  "domain": "example.com",
+  "layoutsDir": "ogimage-layouts"
 }
