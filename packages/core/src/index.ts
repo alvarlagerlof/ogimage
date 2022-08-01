@@ -4,6 +4,7 @@ import { readFile, access, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import logSymbols from "log-symbols";
 import chalk from "chalk";
+import getPort from "get-port";
 
 import metascraper from "metascraper";
 import metascraperTitle from "metascraper-title";
@@ -12,9 +13,9 @@ import metascraperDate from "metascraper-date";
 import metascraperDescription from "metascraper-description";
 import metascraperPublisher from "metascraper-publisher";
 
-// import { startRenderer } from "./do";
-import somefunction from "./someother.js";
-import puppeteer, { Browser } from "puppeteer";
+import startRenderer from "./renderer.js";
+import shoot from "./shooters.ts/playwright.js";
+import { chromium, Browser } from "playwright";
 
 interface Config {
   buildDir: string;
@@ -35,6 +36,9 @@ const log = (() => {
 })();
 
 (async function run() {
+  const port = await getPort();
+  // console.log(`http://localhost:${port}`);
+
   if (await checkFileExists("ogimage.json")) {
     const file = await readFile("ogimage.json", "utf8");
     const config = JSON.parse(file) as Config;
@@ -42,14 +46,30 @@ const log = (() => {
     log.info("Starting browser...");
     const browser: Browser = await startBrowser();
 
+    log.info("Starting renderer...");
+    const stopRenderer = await startRenderer({
+      framework: { type: "react" },
+      projectPath: `${process.cwd()}/${config.layoutsDir}`,
+      port: port,
+    });
+    log.success("Started renderer");
+
     log.info("Looking for html files in", config.buildDir);
-    await walkPath(config, config.buildDir);
+    await walkPath(config, browser, port, config.buildDir);
 
     log.info("Stopping browser...");
     browser.close();
     log.success("Browser stopped");
+
+    log.info("Stopping renderer...");
+    await stopRenderer();
+    log.success("Renderer stopped");
+
+    process.exit(0);
   } else {
     log.error("Did not find config file");
+
+    process.exit(1);
   }
 })();
 
@@ -59,9 +79,13 @@ function shouldExclude(dirOrFile: string): boolean {
   return exclude;
 }
 
-async function walkPath(config: Config, basePath: string) {
+async function walkPath(
+  config: Config,
+  browser: Browser,
+  port: number,
+  basePath: string
+) {
   if (shouldExclude(basePath)) return;
-
   const pathContent = await readdir(basePath, { withFileTypes: true });
 
   const files = pathContent
@@ -70,49 +94,40 @@ async function walkPath(config: Config, basePath: string) {
     .filter((file) => !shouldExclude(file.name))
     .map((file) => file.name);
 
-  await Promise.allSettled(
-    files.map((file) => {
-      new Promise<void>(async (resolve, reject) => {
-        try {
-          const pathString = path.resolve(basePath, file);
+  await Promise.all(
+    files.map(async (file) => {
+      try {
+        const pathString = path.resolve(basePath, file);
 
-          const meta = await extractMeta(pathString);
-          await addOgImageTag(config, pathString);
-          await screenshot(config, meta);
+        const meta = await extractMeta(pathString);
+        await addOgImageTag(config, pathString);
+        await screenshot(browser, pathString, config.buildDir, port, meta);
 
-          log.success(
-            "Done",
-            pathString.replace(process.cwd(), "").substring(1)
-          );
-          resolve();
-        } catch (e) {
-          log.error("Failed to handle file", file, e.message);
-          reject(e);
-        }
-      });
+        log.success("Done", pathString.replace(process.cwd(), "").substring(1));
+      } catch (e) {
+        log.error("Failed to handle file", file, e.message);
+      }
     })
   );
+
   const directories = pathContent
     .filter((item) => !item.isFile())
     .map((directory) => directory.name);
 
-  return await Promise.allSettled(
-    directories.map((directory) => {
-      new Promise<void>(async (resolve, reject) => {
-        try {
-          await walkPath(config, `${basePath}/${directory}`);
-          resolve();
-        } catch {
-          reject();
-        }
-      });
+  await Promise.all(
+    directories.map(async (directory) => {
+      try {
+        await walkPath(config, browser, port, `${basePath}/${directory}`);
+      } catch (e) {
+        log.error(e.message);
+      }
     })
   );
 }
 
-async function startBrowser() {
+async function startBrowser(): Promise<Browser> {
   try {
-    const browser = await puppeteer.launch({
+    const browser = await chromium.launch({
       executablePath: process.env.PUPPETEER_EXEC_PATH,
       headless: true,
     });
@@ -145,7 +160,7 @@ async function addOgImageTag(config: Config, pathString: string) {
     .replace(process.cwd(), "")
     .replace(config.buildDir, "")
     .substring(2)
-    .replace(".html", "")}.jpg`;
+    .replace(".html", "")}.png`;
 
   const tag = `<meta property="og:image" content=${imgUrl} />`;
   const newContent =
@@ -154,15 +169,14 @@ async function addOgImageTag(config: Config, pathString: string) {
   await writeFile(pathString, newContent);
 }
 
-async function screenshot(config: Config, meta: any) {
-  somefunction();
-
-  // await startRenderer({
-  //   framework: { type: "react" },
-  //   projectPath: config.layoutsDir,
-  //   filePathPattern: "",
-  //   port: 6000,
-  // });
+async function screenshot(
+  browser: Browser,
+  pathString: string,
+  buildDir: string,
+  port: number,
+  meta: any
+) {
+  await shoot(browser, pathString, buildDir, meta, `http://localhost:${port}`);
 }
 
 function checkFileExists(file) {

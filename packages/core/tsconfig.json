@@ -4,7 +4,8 @@
     "moduleResolution": "node16",
     "skipLibCheck": true,
     "outDir": "dist",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true
   },
   "include": ["src/**/*"]
 }
