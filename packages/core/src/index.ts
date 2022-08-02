@@ -14,7 +14,7 @@ import metascraperDescription from "metascraper-description";
 import metascraperPublisher from "metascraper-publisher";
 
 import startRenderer from "./renderer.js";
-import shoot from "./shooters.ts/playwright.js";
+import shoot from "./shooters/playwright.js";
 import { chromium, Browser } from "playwright";
 
 interface Config {
