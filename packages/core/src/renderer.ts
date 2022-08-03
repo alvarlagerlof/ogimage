@@ -65,29 +65,6 @@ export default async function startRenderer(options: {
     "utf8"
   );
 
-  // const rendererContent = `${await fs.readFile(
-  //   path.join(rendererDirPath, options.framework.type + extension),
-  //   "utf8"
-  // )}
-  //   ${relativeFilePaths
-  //     .map(
-  //       (componentFilePath, i) =>
-  //         `import componentModule${i} from "/${componentFilePath}";`
-  //     )
-  //     .join("\n")}
-  //   const components = [
-  //     ${relativeFilePaths
-  //       .map((componentFilePath, i) => {
-  //         const [componentBaseName] = componentFilePath.split(".");
-  //         return `[\`${componentBaseName}\`, componentModule${i}],`;
-  //       })
-  //       .join("\n")}
-  //   ];
-  //   renderScreenshots(components).then(__done__).catch(e => {
-  //     __done__(e.stack || e.message || "Unknown error");
-  //   });
-  //   `;
-
   async function renderCustomContent(layout: string) {
     const renderer = await fs.readFile(
       path.join(rendererDirPath, options.framework.type + extension),
