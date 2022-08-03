@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-export async function renderScreenshots(
+export async function renderScreenshot(
   component: React.ComponentType<{}> & {
     beforeScreenshot?: (element: HTMLElement) => Promise<void>;
   }

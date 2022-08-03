@@ -77,8 +77,8 @@ export default async function startRenderer(options: {
 
     const importComponentModule = `import componentModule from "/${filename}";`;
 
-    const renderScreenshotsPart = `
-      renderScreenshots(componentModule).then(__done__).catch(e => {
+    const renderScreenshot = `
+      renderScreenshot(componentModule).then(__done__).catch(e => {
         __done__(e.stack || e.message || "Unknown error");
       });
       `;
@@ -86,7 +86,7 @@ export default async function startRenderer(options: {
     return `
         ${renderer}
         ${importComponentModule}
-        ${renderScreenshotsPart}
+        ${renderScreenshot}
         `;
   }
 
