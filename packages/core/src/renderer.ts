@@ -69,34 +69,21 @@ export default async function startRenderer(options: {
     path.join(rendererDirPath, options.framework.type + extension),
     "utf8"
   )}
-    ${
-      options.wrapper
-        ? `import { ${options.wrapper.componentName} as Wrapper } from '/${options.wrapper.path}';`
-        : "const Wrapper = null;"
-    }
     ${relativeFilePaths
       .map(
         (componentFilePath, i) =>
-          `import ${
-            frameworkConfig.defaultImports ? "" : "* as "
-          } componentModule${i} from "/${componentFilePath}";`
+          `import componentModule${i} from "/${componentFilePath}";`
       )
       .join("\n")}
     const components = [
       ${relativeFilePaths
         .map((componentFilePath, i) => {
           const [componentBaseName] = componentFilePath.split(".");
-          if (frameworkConfig.defaultImports) {
-            return `[\`${componentBaseName}\`, componentModule${i}],`;
-          } else {
-            return `...Object.entries(componentModule${i}).map(([name, component]) => {
-                return [\`${componentBaseName}-\${name}\`, component];
-              }),`;
-          }
+          return `[\`${componentBaseName}\`, componentModule${i}],`;
         })
         .join("\n")}
     ];
-    renderScreenshots(components, Wrapper).then(__done__).catch(e => {
+    renderScreenshots(components).then(__done__).catch(e => {
       __done__(e.stack || e.message || "Unknown error");
     });
     `;
@@ -143,6 +130,7 @@ export default async function startRenderer(options: {
       {
         name: "virtual",
         load: async (id) => {
+          // console.log({ id });
           if (id === "/__main__.tsx") {
             return mainContent;
           }

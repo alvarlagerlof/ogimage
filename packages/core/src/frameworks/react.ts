@@ -5,16 +5,12 @@ import { FrameworkConfiguration } from "./config.js";
 export function reactConfiguration(
   config: {
     type: "react";
-    // svgr?: {
-    //   componentName: string;
-    // };
   },
   viteConfig?: vite.UserConfig
 ): FrameworkConfiguration {
   const alias = viteConfig?.resolve?.alias;
   return {
     packages: ["react", "react-dom"],
-    defaultImports: false,
     plugins: [
       {
         name: "react",
@@ -31,11 +27,6 @@ export function reactConfiguration(
           return null;
         },
       },
-      //   svgrPlugin(
-      //     // Only record aliases are supported, not arrays.
-      //     alias && !Array.isArray(alias) ? (alias as Record<string, string>) : {},
-      //     config.svgr?.componentName
-      //   ),
     ],
   };
 }

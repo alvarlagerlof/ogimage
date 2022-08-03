@@ -1,10 +1,12 @@
-export function Index() {
-  const title = window.meta;
+export default function Index() {
+  const { title = "No title", description = "No description" } =
+    window.meta ?? {};
 
   return (
     <>
-      <p>info</p>
+      <p>default layout</p>
       <h1>{title}</h1>
+      <h2>{description}</h2>
     </>
   );
 }

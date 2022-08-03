@@ -9,10 +9,8 @@ export async function renderScreenshots(
         beforeScreenshot?: (element: HTMLElement) => Promise<void>;
       }
     ]
-  >,
-  Wrapper: React.ComponentType<{}> | null
+  >
 ) {
-  Wrapper ||= React.Fragment;
   const root = document.getElementById("root")!;
   for (const [name, Component] of components) {
     if (typeof Component !== "function") {
@@ -22,11 +20,7 @@ export async function renderScreenshots(
     root.innerHTML = "";
     try {
       ReactDOM.render(
-        React.createElement(
-          Wrapper,
-          {},
-          React.createElement(Component, (Component as any).args || {})
-        ),
+        React.createElement(Component, (Component as any).args || {}),
         root
       );
       const beforeScreenshot = (Component as any).beforeScreenshot;

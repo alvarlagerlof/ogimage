@@ -37,12 +37,6 @@ export default async function shoot(
   await page.exposeFunction("__takeScreenshot__", async (name: string) => {
     const screenshotDirPath = path.resolve(buildDir, "ogimage");
 
-    // needs to happen (once) at root level
-    // await fs.promises.rm(screenshotDirPath, {
-    //   recursive: true,
-    //   force: true,
-    // });
-
     const screenshotPath = path.resolve(
       screenshotDirPath,
       pathString
@@ -53,7 +47,7 @@ export default async function shoot(
     );
 
     await page.evaluate((meta) => {
-      window.meta = { title: "hejsan", description: "tjena" };
+      window.meta = meta;
     }, meta);
 
     await page.screenshot({

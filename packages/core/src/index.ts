@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { constants } from "node:fs";
-import { readFile, access, readdir, writeFile } from "node:fs/promises";
+import { readFile, access, readdir, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 import logSymbols from "log-symbols";
 import chalk from "chalk";
@@ -42,6 +42,13 @@ const log = (() => {
   if (await checkFileExists("ogimage.json")) {
     const file = await readFile("ogimage.json", "utf8");
     const config = JSON.parse(file) as Config;
+
+    // log.info("Clearing generated folder...");
+    // await rm(path.resolve(config.buildDir, "ogimage"), {
+    //   recursive: true,
+    //   force: true,
+    // });
+    // log.success("Cleared generated folder");
 
     log.info("Starting browser...");
     const browser: Browser = await startBrowser();
@@ -99,9 +106,16 @@ async function walkPath(
       try {
         const pathString = path.resolve(basePath, file);
 
-        const meta = await extractMeta(pathString);
         await addOgImageTag(config, pathString);
-        await screenshot(browser, pathString, config.buildDir, port, meta);
+
+        const meta = await extractMeta(pathString);
+        await shoot(
+          browser,
+          pathString,
+          config.buildDir,
+          meta,
+          `http://localhost:${port}`
+        );
 
         log.success("Done", pathString.replace(process.cwd(), "").substring(1));
       } catch (e) {
@@ -167,16 +181,6 @@ async function addOgImageTag(config: Config, pathString: string) {
     content.slice(0, index) + tag + "\n" + content.slice(index);
 
   await writeFile(pathString, newContent);
-}
-
-async function screenshot(
-  browser: Browser,
-  pathString: string,
-  buildDir: string,
-  port: number,
-  meta: any
-) {
-  await shoot(browser, pathString, buildDir, meta, `http://localhost:${port}`);
 }
 
 function checkFileExists(file) {
