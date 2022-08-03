@@ -1,4 +1,4 @@
-export default function Index() {
+export default function Default() {
   const { title = "No title", description = "No description" } =
     window.meta ?? {};
 

@@ -5,7 +5,8 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "noEmit": true
   },
   "include": ["src/**/*"]
 }

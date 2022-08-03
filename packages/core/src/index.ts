@@ -114,7 +114,7 @@ async function walkPath(
           pathString,
           config.buildDir,
           meta,
-          `http://localhost:${port}`
+          `http://localhost:${port}/?layout=default`
         );
 
         log.success("Done", pathString.replace(process.cwd(), "").substring(1));

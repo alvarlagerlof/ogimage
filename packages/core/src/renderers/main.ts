@@ -2,7 +2,7 @@
 
 declare global {
   interface Window {
-    __takeScreenshot__(name: string): Promise<void>;
+    __takeScreenshot__(): Promise<void>;
     __done__(error?: string): Promise<void>;
     meta: any;
   }
@@ -12,8 +12,8 @@ declare global {
 //
 // This is especially useful when running the `debug` command.
 if (!window.__takeScreenshot__) {
-  window.__takeScreenshot__ = (name) => {
-    console.log(`Simulating screenshot: ${name}`);
+  window.__takeScreenshot__ = () => {
+    console.log(`Simulating screenshot`);
     return new Promise((resolve) => setTimeout(resolve, 1000));
   };
   window.__done__ = async (errorMessage) => {

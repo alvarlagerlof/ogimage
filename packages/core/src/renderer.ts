@@ -65,28 +65,53 @@ export default async function startRenderer(options: {
     "utf8"
   );
 
-  const rendererContent = `${await fs.readFile(
-    path.join(rendererDirPath, options.framework.type + extension),
-    "utf8"
-  )}
-    ${relativeFilePaths
-      .map(
-        (componentFilePath, i) =>
-          `import componentModule${i} from "/${componentFilePath}";`
-      )
-      .join("\n")}
-    const components = [
-      ${relativeFilePaths
-        .map((componentFilePath, i) => {
-          const [componentBaseName] = componentFilePath.split(".");
-          return `[\`${componentBaseName}\`, componentModule${i}],`;
-        })
-        .join("\n")}
-    ];
-    renderScreenshots(components).then(__done__).catch(e => {
-      __done__(e.stack || e.message || "Unknown error");
-    });
-    `;
+  // const rendererContent = `${await fs.readFile(
+  //   path.join(rendererDirPath, options.framework.type + extension),
+  //   "utf8"
+  // )}
+  //   ${relativeFilePaths
+  //     .map(
+  //       (componentFilePath, i) =>
+  //         `import componentModule${i} from "/${componentFilePath}";`
+  //     )
+  //     .join("\n")}
+  //   const components = [
+  //     ${relativeFilePaths
+  //       .map((componentFilePath, i) => {
+  //         const [componentBaseName] = componentFilePath.split(".");
+  //         return `[\`${componentBaseName}\`, componentModule${i}],`;
+  //       })
+  //       .join("\n")}
+  //   ];
+  //   renderScreenshots(components).then(__done__).catch(e => {
+  //     __done__(e.stack || e.message || "Unknown error");
+  //   });
+  //   `;
+
+  async function renderCustomContent(layout: string) {
+    const renderer = await fs.readFile(
+      path.join(rendererDirPath, options.framework.type + extension),
+      "utf8"
+    );
+
+    const filename = relativeFilePaths.find(
+      (file) => file.split(".")[0] == layout
+    );
+
+    const importComponentModule = `import componentModule from "/${filename}";`;
+
+    const renderScreenshotsPart = `
+      renderScreenshots(componentModule).then(__done__).catch(e => {
+        __done__(e.stack || e.message || "Unknown error");
+      });
+      `;
+
+    return `
+        ${renderer}
+        ${importComponentModule}
+        ${renderScreenshotsPart}
+        `;
+  }
 
   const viteServer = await vite.createServer({
     root: options.projectPath,
@@ -130,12 +155,15 @@ export default async function startRenderer(options: {
       {
         name: "virtual",
         load: async (id) => {
-          // console.log({ id });
           if (id === "/__main__.tsx") {
             return mainContent;
           }
-          if (id === "/__renderer__.tsx") {
-            return rendererContent;
+          // if (id === "/__renderer__.tsx") {
+          //   return rendererContent;
+          // }
+          if (id.startsWith("/__renderer__")) {
+            const layout = id.replace("/__renderer__", "").replace(".tsx", "");
+            return renderCustomContent(layout);
           }
           if (id.endsWith(".js")) {
             const source = await fs.readFile(id, "utf8");
@@ -154,9 +182,13 @@ export default async function startRenderer(options: {
   });
   const app = connect();
   app.use(async (req, res, next) => {
-    if (req.originalUrl !== "/") {
+    if (req.originalUrl.split("?")[0] !== "/") {
       return next();
     }
+
+    const url = new URL("http://example.com" + req.originalUrl);
+    const layout = url.searchParams.get("layout");
+
     const html = await viteServer.transformIndexHtml(
       req.originalUrl,
       `
@@ -177,7 +209,7 @@ export default async function startRenderer(options: {
           <body>
             <div id="root"></div>
             <script type="module" src="/__main__.tsx"></script>
-            <script type="module" src="/__renderer__.tsx"></script>
+            <script type="module" src="/__renderer__${layout}.tsx"></script>
           </body>
         </html>
         `
