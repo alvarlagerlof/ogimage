@@ -9,7 +9,8 @@
     "prepare": "svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "ogimage": "ogimage"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "next",

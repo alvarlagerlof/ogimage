@@ -15,6 +15,7 @@
         "docs/.vitepress/dist/**"
       ]
     },
+    "ogimage": {},
     "test": {
       "dependsOn": ["build"],
       "outputs": [],

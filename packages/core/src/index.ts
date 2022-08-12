@@ -16,12 +16,15 @@ import metascraperPublisher from "metascraper-publisher";
 import startRenderer from "./renderer.js";
 import shoot from "./shooters/playwright.js";
 import { chromium, Browser } from "playwright";
+import pLimit from "p-limit";
 
 interface Config {
   buildDir: string;
   domain: string;
   layoutsDir: string;
 }
+
+const limit = pLimit(10);
 
 const log = (() => {
   const base = (level: string, ...message) =>
@@ -34,6 +37,8 @@ const log = (() => {
     error: (...message) => base(logSymbols.error, ...message),
   };
 })();
+
+let count = 0;
 
 (async function run() {
   const port = await getPort();
@@ -72,6 +77,8 @@ const log = (() => {
     await stopRenderer();
     log.success("Renderer stopped");
 
+    log.info(`Captured ${count} pages`);
+
     process.exit(0);
   } else {
     log.error("Did not find config file");
@@ -102,41 +109,60 @@ async function walkPath(
     .map((file) => file.name);
 
   await Promise.all(
-    files.map(async (file) => {
-      try {
-        const pathString = path.resolve(basePath, file);
+    files.map(async (file) =>
+      limit(async () => {
+        try {
+          const pathString = path.resolve(basePath, file);
 
-        await addOgImageTag(config, pathString);
+          await addOgImageTag(config, pathString);
 
-        const meta = await extractMeta(pathString);
+          const meta = await extractMeta(pathString);
 
-        await shoot(
-          browser,
-          pathString,
-          config.buildDir,
-          meta,
-          `http://localhost:${port}/?layout=default`
-        );
+          await shoot(
+            browser,
+            pathString,
+            config.buildDir,
+            meta,
+            `http://localhost:${port}/?layout=default`
+          );
 
-        log.success("Done", pathString.replace(process.cwd(), "").substring(1));
-      } catch (e) {
-        log.error("Failed to handle file", file, e.message);
-      }
-    })
+          count++;
+
+          log.success(
+            "Done",
+            pathString.replace(process.cwd(), "").substring(1)
+          );
+        } catch (e) {
+          log.error("Failed to handle file", file, e.message);
+        }
+      })
+    )
   );
 
   const directories = pathContent
     .filter((item) => !item.isFile())
     .map((directory) => directory.name);
 
+  // await Promise.all(
+  //   directories.map(async (directory) => {
+  //     try {
+  //       await walkPath(config, browser, port, `${basePath}/${directory}`);
+  //     } catch (e) {
+  //       log.error(e.message);
+  //     }
+  //   })
+  // );
+
   await Promise.all(
-    directories.map(async (directory) => {
-      try {
-        await walkPath(config, browser, port, `${basePath}/${directory}`);
-      } catch (e) {
-        log.error(e.message);
-      }
-    })
+    directories.map(async (directory) =>
+      limit(async () => {
+        try {
+          await walkPath(config, browser, port, `${basePath}/${directory}`);
+        } catch (e) {
+          log.error(e.message);
+        }
+      })
+    )
   );
 }
 

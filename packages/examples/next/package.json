@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build && ogimage",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ogimage": "ogimage"
   },
   "dependencies": {
     "next": "12.2.3",

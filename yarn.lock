@@ -12889,21 +12889,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gatsby-plugin-google-analytics@npm:^4.19.0":
-  version: 4.20.0
-  resolution: "gatsby-plugin-google-analytics@npm:4.20.0"
-  dependencies:
-    "@babel/runtime": ^7.15.4
-    minimatch: 3.0.4
-    web-vitals: ^1.1.2
-  peerDependencies:
-    gatsby: ^4.0.0-next
-    react: ^16.9.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0
-  checksum: f108ae693c8d9c424b36d39c9dca41d93517f45fd462e03f5eeca57278b0b4eb1cd6acb505a69cfc65d2108d852f61f280f90378ba35c45d85d6e324dcba55c4
-  languageName: node
-  linkType: hard
-
 "gatsby-plugin-mdx@npm:^3.19.0":
   version: 3.19.0
   resolution: "gatsby-plugin-mdx@npm:3.19.0"
@@ -17944,21 +17929,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"my-gatsby-site@workspace:packages/examples/gatsby/my-gatsby-site":
-  version: 0.0.0-use.local
-  resolution: "my-gatsby-site@workspace:packages/examples/gatsby/my-gatsby-site"
-  dependencies:
-    "@types/node": ^17.0.45
-    "@types/react": ^18.0.15
-    "@types/react-dom": ^18.0.6
-    gatsby: ^4.19.2
-    gatsby-plugin-google-analytics: ^4.19.0
-    react: ^18.1.0
-    react-dom: ^18.1.0
-    typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
-
 "nan@npm:^2.16.0":
   version: 2.16.0
   resolution: "nan@npm:2.16.0"
@@ -18554,6 +18524,7 @@ __metadata:
     metascraper-image: ^5.29.15
     metascraper-publisher: ^5.29.15
     metascraper-title: ^5.29.15
+    p-limit: ^4.0.0
     puppeteer: ^15.5.0
     typescript: ^4.7.4
   bin:
@@ -18765,6 +18736,15 @@ __metadata:
   dependencies:
     p-try: ^2.0.0
   checksum: 84ff17f1a38126c3314e91ecfe56aecbf36430940e2873dadaa773ffe072dc23b7af8e46d4b6485d302a11673fe94c6b67ca2cfbb60c989848b02100d0594ac1
+  languageName: node
+  linkType: hard
+
+"p-limit@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "p-limit@npm:4.0.0"
+  dependencies:
+    yocto-queue: ^1.0.0
+  checksum: 01d9d70695187788f984226e16c903475ec6a947ee7b21948d6f597bed788e3112cc7ec2e171c1d37125057a5f45f3da21d8653e04a3a793589e12e9e80e756b
   languageName: node
   linkType: hard
 
@@ -25024,13 +25004,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^1.1.2":
-  version: 1.1.2
-  resolution: "web-vitals@npm:1.1.2"
-  checksum: 92071029089277166e11141b735831d9011e85737d32c1360034676db898ab0ca95f19041ee01904f2189ad6e711b9da6b17567e4831290a429a586c98bc573f
-  languageName: node
-  linkType: hard
-
 "webidl-conversions@npm:^3.0.0":
   version: 3.0.1
   resolution: "webidl-conversions@npm:3.0.1"
@@ -25839,6 +25812,13 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
+  languageName: node
+  linkType: hard
+
+"yocto-queue@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "yocto-queue@npm:1.0.0"
+  checksum: 2cac84540f65c64ccc1683c267edce396b26b1e931aa429660aefac8fbe0188167b7aee815a3c22fa59a28a58d898d1a2b1825048f834d8d629f4c2a5d443801
   languageName: node
   linkType: hard
 

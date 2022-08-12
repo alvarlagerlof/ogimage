@@ -3,6 +3,7 @@
   "packageManager": "yarn@3.2.2",
   "scripts": {
     "build": "turbo run build",
+    "ogimage": "turbo run ogimage",
     "dev": "turbo run dev",
     "test": "turbo run test",
     "lint": "turbo run lint",

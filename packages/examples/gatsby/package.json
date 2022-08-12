@@ -13,7 +13,8 @@
     "build": "gatsby build && ogimage",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "ogimage": "ogimage"
   },
   "dependencies": {
     "@mdx-js/mdx": "^1.6.22",
