@@ -9,7 +9,8 @@
   "type": "module",
   "scripts": {
     "build": "npx swc ./src -d dist",
-    "dev": "yarn build --watch"
+    "dev": "yarn build --watch",
+    "test": "jest"
   },
   "bin": "dist/index.js",
   "files": [

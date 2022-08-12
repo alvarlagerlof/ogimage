@@ -109,6 +109,7 @@ async function walkPath(
         await addOgImageTag(config, pathString);
 
         const meta = await extractMeta(pathString);
+
         await shoot(
           browser,
           pathString,

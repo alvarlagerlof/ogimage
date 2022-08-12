@@ -1,5 +1,3 @@
-import { test, expect } from "bun:test";
-
 function sum(a, b) {
   return a + b;
 }

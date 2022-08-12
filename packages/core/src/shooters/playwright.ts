@@ -33,8 +33,9 @@ export default async function shoot(
   //     })
   //   );
   // });
+  const logs = [];
 
-  await page.exposeFunction("__takeScreenshot__", async (name: string) => {
+  await page.exposeFunction("__takeScreenshot__", async () => {
     const screenshotDirPath = path.resolve(buildDir, "ogimage");
 
     const screenshotPath = path.resolve(
@@ -45,6 +46,9 @@ export default async function shoot(
         .substring(2)
         .replace(".html", "") + ".png"
     );
+    page.on("console", (message) => {
+      logs.push(message.text());
+    });
 
     await page.evaluate((meta) => {
       window.meta = meta;
@@ -54,6 +58,10 @@ export default async function shoot(
       fullPage: true,
       path: screenshotPath,
     });
+  });
+
+  await page.exposeFunction("__getMeta__", () => {
+    return meta;
   });
 
   let errorMessage: string | null = null;
@@ -71,6 +79,9 @@ export default async function shoot(
   await page.goto(url);
 
   await donePromise;
+
+  console.log(logs);
+
   if (errorMessage) {
     throw new Error(errorMessage);
   }
