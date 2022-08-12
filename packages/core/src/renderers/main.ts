@@ -26,6 +26,7 @@ if (!window.__takeScreenshot__) {
       console.log(`Done without errors.`);
     }
   };
+  // window.meta == ({} as Metadata);
 }
 
 // Useful polyfills.

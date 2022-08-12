@@ -76,18 +76,15 @@ export default async function startRenderer(options: {
     )}";`;
 
     const renderScreenshot = `
-      renderScreenshot(componentModule).then(__done__).catch(e => {
+      const meta = await window.__meta__()
+
+      renderScreenshot(componentModule, meta).then(__done__).catch(e => {
         __done__(e.stack || e.message || "Unknown error");
       });
       `;
 
-    const insertMeta = `
-      window.meta = await window.__meta__();
-    `;
-
     return `
         ${renderer}
-        ${insertMeta}
         ${importComponentModule}
         ${renderScreenshot}
         `;

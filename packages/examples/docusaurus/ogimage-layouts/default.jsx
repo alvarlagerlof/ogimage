@@ -1,7 +1,7 @@
-export default function Default() {
-  const { title = "No title", description = "No description" } =
-    window.meta ?? {};
-
+export default function Default({
+  title = "No title",
+  description = "No description",
+}) {
   return (
     <>
       <p>default layout</p>

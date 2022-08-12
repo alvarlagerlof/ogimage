@@ -1,7 +1,11 @@
+import { Metadata } from "metascraper";
 import React from "react";
 import ReactDOM from "react-dom";
 
-export async function renderScreenshot(component: React.ComponentType<{}>) {
+export async function renderScreenshot(
+  component: React.ComponentType<{}>,
+  meta: Metadata
+) {
   const root = document.getElementById("root")!;
 
   if (typeof component !== "function") {
@@ -11,10 +15,7 @@ export async function renderScreenshot(component: React.ComponentType<{}>) {
   root.innerHTML = "";
 
   try {
-    ReactDOM.render(
-      React.createElement(component, (component as any).args || {}),
-      root
-    );
+    ReactDOM.render(React.createElement(component, meta || {}), root);
   } catch (e) {
     root.innerHTML = `<pre class="viteshot-error">${
       (e as any).stack || e

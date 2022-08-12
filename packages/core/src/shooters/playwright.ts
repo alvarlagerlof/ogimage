@@ -1,8 +1,6 @@
-import fs from "fs";
 import { Metadata } from "metascraper";
 import path from "path";
 import playwright from "playwright";
-import { Shooter } from "../config.js";
 
 const DEFAULT_TIMEOUT_MILLIS = 2 * 60 * 1000;
 
@@ -47,6 +45,7 @@ export default async function shoot(
       resolve();
     };
   });
+
   await page.exposeFunction("__done__", done);
 
   await page.goto(url);
