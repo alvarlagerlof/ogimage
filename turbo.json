@@ -12,7 +12,7 @@
         "public",
         ".cache/**",
         ".svelte-kit/**",
-        "docs/vitepress/dist/**"
+        "docs/.vitepress/dist/**"
       ]
     },
     "test": {
