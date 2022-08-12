@@ -1,10 +1,13 @@
 /// <reference types="vite/client" />
 
+import { Metadata } from "metascraper";
+
 declare global {
   interface Window {
     __takeScreenshot__(): Promise<void>;
     __done__(error?: string): Promise<void>;
-    meta: any;
+    __meta__(): Metadata;
+    meta: Metadata;
   }
 }
 
@@ -26,11 +29,11 @@ if (!window.__takeScreenshot__) {
 }
 
 // Useful polyfills.
-const w = window as any;
-w.global ||= window;
-w.process ||= {
-  env: {},
-};
+// const w = window as any;
+// w.global ||= window;
+// w.process ||= {
+//   env: {},
+// };
 
 // Catch runtime errors and stop immediately.
 window.onerror = (event, source, lineno, colno, error) => {

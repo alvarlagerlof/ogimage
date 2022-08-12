@@ -71,11 +71,9 @@ export default async function startRenderer(options: {
       "utf8"
     );
 
-    const filename = relativeFilePaths.find(
+    const importComponentModule = `import componentModule from "/${relativeFilePaths.find(
       (file) => file.split(".")[0] == layout
-    );
-
-    const importComponentModule = `import componentModule from "/${filename}";`;
+    )}";`;
 
     const renderScreenshot = `
       renderScreenshot(componentModule).then(__done__).catch(e => {
@@ -83,8 +81,13 @@ export default async function startRenderer(options: {
       });
       `;
 
+    const insertMeta = `
+      window.meta = await window.__meta__();
+    `;
+
     return `
         ${renderer}
+        ${insertMeta}
         ${importComponentModule}
         ${renderScreenshot}
         `;
@@ -98,9 +101,6 @@ export default async function startRenderer(options: {
       hmr: {
         overlay: false,
       },
-    },
-    define: {
-      "process.env": {},
     },
     optimizeDeps: {
       esbuildOptions: {

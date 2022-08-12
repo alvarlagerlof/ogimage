@@ -6,7 +6,7 @@ import logSymbols from "log-symbols";
 import chalk from "chalk";
 import getPort from "get-port";
 
-import metascraper from "metascraper";
+import metascraper, { Metadata } from "metascraper";
 import metascraperTitle from "metascraper-title";
 import metascraperImage from "metascraper-image";
 import metascraperDate from "metascraper-date";
@@ -153,7 +153,7 @@ async function startBrowser(): Promise<Browser> {
   }
 }
 
-async function extractMeta(pathString: string) {
+async function extractMeta(pathString: string): Promise<Metadata> {
   const content = (await readFile(pathString)).toString();
 
   const scraper = await metascraper([
