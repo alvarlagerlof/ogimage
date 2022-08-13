@@ -32,6 +32,8 @@
     "metascraper-publisher": "^5.29.15",
     "metascraper-title": "^5.29.15",
     "p-limit": "^4.0.0",
-    "puppeteer": "^15.5.0"
+    "puppeteer": "^15.5.0",
+    "ts-jest": "^28.0.7",
+    "ts-node": "^10.9.1"
   }
 }
