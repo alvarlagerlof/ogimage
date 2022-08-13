@@ -1,217 +1,151 @@
 #!/usr/bin/env node
-import { constants } from "node:fs";
-import { readFile, access, readdir, writeFile, rm } from "node:fs/promises";
-import path from "node:path";
-import logSymbols from "log-symbols";
-import chalk from "chalk";
 import getPort from "get-port";
+import { Browser } from "playwright";
 
-import metascraper, { Metadata } from "metascraper";
-import metascraperTitle from "metascraper-title";
-import metascraperImage from "metascraper-image";
-import metascraperDate from "metascraper-date";
-import metascraperDescription from "metascraper-description";
-import metascraperPublisher from "metascraper-publisher";
+import startRenderer from "./vite/index.js";
+import addOgImageTag from "./addOgImageTag.js";
+import capture from "./capture.js";
+import pLimit, { LimitFunction } from "p-limit";
+import step from "./step.js";
+import log from "./log.js";
+import walkPath from "./walk.js";
+import { Config } from "./types.js";
+import { Metadata } from "metascraper";
+import extractMeta from "./extractMeta.js";
+import startBrowser from "./browser.js";
+import loadConfig from "./config.js";
+import clearGenerated from "./frameworks/clear.js";
 
-import startRenderer from "./renderer.js";
-import shoot from "./shooters/playwright.js";
-import { chromium, Browser } from "playwright";
-import pLimit from "p-limit";
-
-interface Config {
-  buildDir: string;
-  domain: string;
-  layoutsDir: string;
+interface PathStringWithMetadata {
+  pathString: string;
+  metadata: Metadata;
 }
 
-const limit = pLimit(10);
-
-const log = (() => {
-  const base = (level: string, ...message) =>
-    console.log(chalk.grey("ogimage"), level, ...message);
-
-  return {
-    info: (...message) => base(logSymbols.info, ...message),
-    success: (...message) => base(logSymbols.success, ...message),
-    warning: (...message) => base(logSymbols.warning, ...message),
-    error: (...message) => base(logSymbols.error, ...message),
-  };
-})();
-
-let count = 0;
+const limit: LimitFunction = pLimit(3);
 
 (async function run() {
   const port = await getPort();
-  // console.log(`http://localhost:${port}`);
 
-  if (await checkFileExists("ogimage.json")) {
-    const file = await readFile("ogimage.json", "utf8");
-    const config = JSON.parse(file) as Config;
+  const config = await step<Config>({
+    initialMessage: () => "Loading config...",
+    execute: async () => {
+      return await loadConfig();
+    },
+    successMessage: () => "Loaded config",
+    failMessage: () => "Failed to load config",
+  });
 
-    // log.info("Clearing generated folder...");
-    // await rm(path.resolve(config.buildDir, "ogimage"), {
-    //   recursive: true,
-    //   force: true,
-    // });
-    // log.success("Cleared generated folder");
+  await step<void>({
+    initialMessage: () => "Clearing generated folder...",
+    execute: async () => await clearGenerated(config.buildDir),
+    successMessage: () => "Cleared generated folder",
+    failMessage: () => "Failed to clear generated folder",
+  });
 
-    log.info("Starting browser...");
-    const browser: Browser = await startBrowser();
+  const browser = await step<Browser>({
+    initialMessage: () => "Starting browser...",
+    execute: async () => await startBrowser(),
+    successMessage: () => "Browser started",
+    failMessage: () => `Failed to start browser`,
+  });
 
-    log.info("Starting renderer...");
-    const stopRenderer = await startRenderer({
-      framework: { type: "react" },
-      projectPath: `${process.cwd()}/${config.layoutsDir}`,
-      port: port,
-    });
-    log.success("Started renderer");
+  const stopRenderer = await step<() => Promise<void>>({
+    initialMessage: () => "Starting renderer...",
+    execute: async () =>
+      await startRenderer({
+        framework: { type: "react" },
+        projectPath: `${process.cwd()}/${config.layoutsDir}`,
+        port: port,
+      }),
+    successMessage: () => `Started renderer at port: ${port}`,
+    failMessage: () => `Failed to renderer`,
+  });
 
-    log.info("Looking for html files in", config.buildDir);
-    await walkPath(config, browser, port, config.buildDir);
+  const pathStrings = await step<string[]>({
+    initialMessage: () => `Looking for html files in ${config.buildDir}`,
+    execute: async () => await walkPath(limit, config, config.buildDir),
+    successMessage: (returnValue) => `Found ${returnValue.length} html files`,
+    failMessage: () => `Failed to look for html files`,
+  });
 
-    log.info("Stopping browser...");
-    browser.close();
-    log.success("Browser stopped");
+  await step({
+    initialMessage: () => `Adding meta og:image tags...`,
+    execute: async () =>
+      await Promise.all(
+        pathStrings.map(async (pathString) =>
+          limit(async () => {
+            await addOgImageTag(config, pathString);
+          })
+        )
+      ),
+    successMessage: (returnValue) =>
+      `Added meta og:image tags ${returnValue.length} to html files`,
+    failMessage: () => `Failed to add meta og:image tags`,
+  });
 
-    log.info("Stopping renderer...");
-    await stopRenderer();
-    log.success("Renderer stopped");
+  const pathStringsWithMetadata = await step<PathStringWithMetadata[]>({
+    initialMessage: () => `Extracting metadata...`,
+    execute: async () =>
+      await Promise.all(
+        pathStrings.map(async (pathString) =>
+          limit(async () => {
+            return {
+              pathString: pathString,
+              metadata: await extractMeta(pathString),
+            };
+          })
+        )
+      ),
+    successMessage: (returnValue) =>
+      `Extracted metadata from ${returnValue.length} html`,
+    failMessage: () => `Failed to extract metadata`,
+  });
 
-    log.info(`Captured ${count} pages`);
+  await Promise.all(
+    pathStringsWithMetadata.map(async (pathStringWithMetadata, index) =>
+      limit(async () => {
+        await step({
+          execute: async () =>
+            await capture(
+              browser,
+              pathStringWithMetadata.pathString,
+              config.buildDir,
+              pathStringWithMetadata.metadata,
+              `http://localhost:${port}/?layout=default`
+            ),
+          successMessage: () => {
+            const progress = `(${index + 1} / ${
+              pathStringsWithMetadata.length
+            }`;
 
-    process.exit(0);
-  } else {
-    log.error("Did not find config file");
+            const file = pathStringWithMetadata.pathString
+              .replace(process.cwd(), "")
+              .substring(1);
 
-    process.exit(1);
-  }
+            return `${progress} Captured for ${file}`;
+          },
+          failMessage: () => `Failed to add meta og:image tags`,
+        });
+      })
+    )
+  );
+
+  log.success(`Captured for ${pathStringsWithMetadata.length} pages`);
+  log.success(`DONE ✨`);
+
+  await step({
+    initialMessage: () => `Stopping browser...`,
+    execute: async () => await browser.close(),
+    successMessage: () => "Browser stopped",
+    failMessage: () => "Failed to stop the browser",
+  });
+
+  await step({
+    initialMessage: () => "Stopping renderer...",
+    execute: async () => await stopRenderer(),
+    successMessage: () => "Renderer stopped",
+    failMessage: () => "Failed to stop the renderer",
+  });
+
+  process.exit(0);
 })();
-
-function shouldExclude(dirOrFile: string): boolean {
-  const exclude = ["404", "500"].some((item) => dirOrFile.includes(item));
-  if (exclude) log.warning("Excluded", dirOrFile);
-  return exclude;
-}
-
-async function walkPath(
-  config: Config,
-  browser: Browser,
-  port: number,
-  basePath: string
-) {
-  if (shouldExclude(basePath)) return;
-  const pathContent = await readdir(basePath, { withFileTypes: true });
-
-  const files = pathContent
-    .filter((item) => item.isFile())
-    .filter((file) => path.extname(file.name).toLowerCase() == ".html")
-    .filter((file) => !shouldExclude(file.name))
-    .map((file) => file.name);
-
-  await Promise.all(
-    files.map(async (file) =>
-      limit(async () => {
-        try {
-          const pathString = path.resolve(basePath, file);
-
-          await addOgImageTag(config, pathString);
-
-          const meta = await extractMeta(pathString);
-
-          await shoot(
-            browser,
-            pathString,
-            config.buildDir,
-            meta,
-            `http://localhost:${port}/?layout=default`
-          );
-
-          count++;
-
-          log.success(
-            "Done",
-            pathString.replace(process.cwd(), "").substring(1)
-          );
-        } catch (e) {
-          log.error("Failed to handle file", file, e.message);
-        }
-      })
-    )
-  );
-
-  const directories = pathContent
-    .filter((item) => !item.isFile())
-    .map((directory) => directory.name);
-
-  // await Promise.all(
-  //   directories.map(async (directory) => {
-  //     try {
-  //       await walkPath(config, browser, port, `${basePath}/${directory}`);
-  //     } catch (e) {
-  //       log.error(e.message);
-  //     }
-  //   })
-  // );
-
-  await Promise.all(
-    directories.map(async (directory) =>
-      limit(async () => {
-        try {
-          await walkPath(config, browser, port, `${basePath}/${directory}`);
-        } catch (e) {
-          log.error(e.message);
-        }
-      })
-    )
-  );
-}
-
-async function startBrowser(): Promise<Browser> {
-  try {
-    const browser = await chromium.launch({
-      executablePath: process.env.PUPPETEER_EXEC_PATH,
-      headless: true,
-    });
-    log.success("Started browser");
-    return browser;
-  } catch (e) {
-    log.error("Failed to start browser", e.message);
-  }
-}
-
-async function extractMeta(pathString: string): Promise<Metadata> {
-  const content = (await readFile(pathString)).toString();
-
-  const scraper = await metascraper([
-    metascraperTitle(),
-    metascraperImage(),
-    metascraperDate(),
-    metascraperDescription(),
-    metascraperPublisher(),
-  ]);
-
-  return await scraper({ url: null, html: content, validateUrl: false });
-}
-
-async function addOgImageTag(config: Config, pathString: string) {
-  const content = (await readFile(pathString)).toString();
-  const index = content.indexOf("</head>");
-
-  const imgUrl = `https://${config.domain}/ogimage/${pathString
-    .replace(process.cwd(), "")
-    .replace(config.buildDir, "")
-    .substring(2)
-    .replace(".html", "")}.png`;
-
-  const tag = `<meta property="og:image" content=${imgUrl} />`;
-  const newContent =
-    content.slice(0, index) + tag + "\n" + content.slice(index);
-
-  await writeFile(pathString, newContent);
-}
-
-function checkFileExists(file) {
-  return access(file, constants.F_OK)
-    .then(() => true)
-    .catch(() => false);
-}

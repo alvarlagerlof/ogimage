@@ -42,17 +42,9 @@ async function fetchPosts() {
     (res) => res.json()
   );
 
-  // const morePosts = posts.map((post) => [
-  //   ...posts.map((item, index) => ({ ...item, id: post.id + item.id + index })),
-  // ]);
-
-  // console.log(morePosts);
-
-  // Array.from({length: times}, () => func());
-
   let counter = 0;
 
-  const morePosts = [...new Array(2)]
+  const morePosts = [...new Array(1)]
     .map(() => {
       return posts.map((post) => {
         counter++;

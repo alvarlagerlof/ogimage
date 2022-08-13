@@ -4,7 +4,7 @@ import playwright from "playwright";
 
 const DEFAULT_TIMEOUT_MILLIS = 2 * 60 * 1000;
 
-export default async function shoot(
+export default async function capture(
   browser: playwright.Browser,
   pathString: string,
   buildDir: string,
@@ -17,20 +17,17 @@ export default async function shoot(
 
   await page.exposeFunction("__meta__", async () => <Metadata>meta);
 
+  const screenshotPath = path.resolve(
+    path.resolve(buildDir, "ogimage"),
+    pathString
+      .replace(process.cwd(), "")
+      .replace(buildDir, "")
+      .substring(2)
+      .replace(".html", "") + ".jpg"
+  );
+
   await page.exposeFunction("__takeScreenshot__", async () => {
-    const screenshotDirPath = path.resolve(buildDir, "ogimage");
-
-    const screenshotPath = path.resolve(
-      screenshotDirPath,
-      pathString
-        .replace(process.cwd(), "")
-        .replace(buildDir, "")
-        .substring(2)
-        .replace(".html", "") + ".png"
-    );
-
     await page.screenshot({
-      fullPage: true,
       path: screenshotPath,
     });
   });

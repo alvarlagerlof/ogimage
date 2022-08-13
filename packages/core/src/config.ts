@@ -1,31 +1,19 @@
-import * as vite from "vite";
+import { readFile, access } from "node:fs/promises";
+import { constants } from "node:fs";
 
-export interface UserConfig {
-  framework: FrameworkOptions;
-  filePathPattern: string;
-  projectPath: string;
-  wrapper?: WrapperConfig;
-  shooter: Shooter;
-  vite?: vite.UserConfig;
+import { Config } from "./types.js";
+
+export default async function loadConfig() {
+  if (!checkFileExists("ogimage.json")) {
+    throw Error("No config file found");
+  }
+
+  const file = await readFile("ogimage.json", "utf8");
+  return JSON.parse(file) as Config;
 }
 
-export type FrameworkOptions =
-  // | {
-  //     type: "react";
-  //     svgr?: {
-  //       componentName: string;
-  //     };
-  //   }
-  {
-    type: "react" | "preact" | "solid" | "svelte" | "vue";
-  };
-
-export interface WrapperConfig {
-  path: string;
-  componentName: string;
+function checkFileExists(file) {
+  return access(file, constants.F_OK)
+    .then(() => true)
+    .catch(() => false);
 }
-export interface Shooter {
-  shoot(url: string): Promise<string[]>;
-}
-
-export type Framework = "preact" | "react" | "solid" | "svelte" | "vue";

@@ -1,6 +1,6 @@
 import * as vite from "vite";
 // import { svgrPlugin } from "../plugins/svgr-plugin";
-import { FrameworkConfiguration } from "./config.js";
+import { FrameworkConfiguration } from "../types.js";
 
 export function reactConfiguration(
   config: {
