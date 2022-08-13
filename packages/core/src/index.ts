@@ -131,7 +131,6 @@ const limit: LimitFunction = pLimit(3);
   );
 
   log.success(`Captured for ${pathStringsWithMetadata.length} pages`);
-  log.success(`DONE ✨`);
 
   await step({
     initialMessage: () => `Stopping browser...`,
