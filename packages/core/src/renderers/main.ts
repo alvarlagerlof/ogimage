@@ -19,6 +19,8 @@ if (!window.__takeScreenshot__) {
     console.log(`Simulating screenshot`);
     return new Promise((resolve) => setTimeout(resolve, 1000));
   };
+
+  // eslint-disable-next-line @typescript-eslint/require-await
   window.__done__ = async (errorMessage) => {
     if (errorMessage) {
       console.error(`Done with error: ${errorMessage}`);
@@ -26,7 +28,6 @@ if (!window.__takeScreenshot__) {
       console.log(`Done without errors.`);
     }
   };
-  // window.meta == ({} as Metadata);
 }
 
 // Useful polyfills.
@@ -38,11 +39,12 @@ if (!window.__takeScreenshot__) {
 
 // Catch runtime errors and stop immediately.
 window.onerror = (event, source, lineno, colno, error) => {
-  window.__done__((error && (error.stack || error.message)) || "Unknown error");
+  void window.__done__(
+    (error && (error.stack || error.message)) || "Unknown error"
+  );
 };
 
 // Catch Vite errors and also stop immediately.
-// @ts-ignore Fixing this error would break ts-node-dev.
 import.meta.hot?.on("vite:error", (payload) => {
-  window.__done__(payload.err.message);
+  void window.__done__(payload.err.message);
 });

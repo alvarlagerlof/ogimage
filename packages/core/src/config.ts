@@ -1,10 +1,10 @@
 import { readFile, access } from "node:fs/promises";
-import { constants } from "node:fs";
+import { constants, PathLike } from "node:fs";
 
 import { Config } from "./types.js";
 
 export default async function loadConfig() {
-  if (!checkFileExists("ogimage.json")) {
+  if (!(await checkFileExists("ogimage.json"))) {
     throw Error("No config file found");
   }
 
@@ -12,8 +12,8 @@ export default async function loadConfig() {
   return JSON.parse(file) as Config;
 }
 
-function checkFileExists(file) {
-  return access(file, constants.F_OK)
+async function checkFileExists(file: PathLike): Promise<boolean> {
+  return await access(file, constants.F_OK)
     .then(() => true)
     .catch(() => false);
 }

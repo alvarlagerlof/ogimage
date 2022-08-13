@@ -1,32 +1,34 @@
 import path from "path";
-import fs from "fs-extra";
+import fs from "fs";
+import { readFile } from "fs/promises";
 
 import { Options } from "./index.js";
-import { getRelativeFilePaths, getRendererDirPath } from "./paths.js";
+import { getRelativeFilePaths, getRendererDirPath } from "../paths.js";
+
+async function exists(path: fs.PathLike) {
+  try {
+    await fs.promises.stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function renderMainContent() {
   const rendererDirPath = getRendererDirPath();
 
-  const extension = (await fs.pathExists(path.join(rendererDirPath, "main.js")))
+  const extension = (await exists(path.join(rendererDirPath, "main.js")))
     ? ".js"
     : ".ts";
-  return await fs.readFile(
-    path.join(rendererDirPath, "main" + extension),
-    "utf8"
-  );
+
+  return await readFile(path.join(rendererDirPath, "main" + extension), "utf8");
 }
 
 export async function renderCustomContent(layout: string, options: Options) {
   const relativeFilePaths = await getRelativeFilePaths(options.projectPath);
 
-  const rendererDirPath = getRendererDirPath();
-
-  const extension = (await fs.pathExists(path.join(rendererDirPath, "main.js")))
-    ? ".js"
-    : ".ts";
-
-  const renderer = await fs.readFile(
-    path.join(rendererDirPath, options.framework.type + extension),
+  const renderer = await readFile(
+    path.join(getRendererDirPath(), options.framework.type + ".js"),
     "utf8"
   );
 

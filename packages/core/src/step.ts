@@ -24,7 +24,9 @@ export default async function step<T>({
       `${successMessage(returnValue)} ${chalk.yellow(`${stop - start}ms`)}`
     );
     return returnValue;
-  } catch (error) {
+  } catch (e) {
+    const error = e as Error;
+
     const stop = Date.now();
     log.error(`${failMessage()} ${chalk.yellow(`${stop - start}ms`)}
         ${error.message}

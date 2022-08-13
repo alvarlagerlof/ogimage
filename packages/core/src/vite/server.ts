@@ -1,32 +1,35 @@
 import * as vite from "vite";
 import friendlyTypeImports from "rollup-plugin-friendly-type-imports";
 import tsconfigPaths from "vite-tsconfig-paths";
-import fs from "fs-extra";
 import * as esbuild from "esbuild";
+import { readFile } from "fs/promises";
 
 import { Options } from "./index.js";
-import { getRelativeFilePaths } from "./paths.js";
+import { getRelativeFilePaths } from "../paths.js";
 import { renderMainContent, renderCustomContent } from "./content.js";
 
-async function getFrameworkConfig(options) {
+async function getFrameworkConfig(options: Options) {
   switch (options.framework.type) {
-    //   case "preact":
-    //     const { preactConfiguration } = await import("./frameworks/preact");
-    //     return preactConfiguration();
+    case "preact":
+      return (await import("../frameworks/preact.js")).preactConfiguration();
     case "react":
-      const { reactConfiguration } = await import("../frameworks/react.js");
-      return reactConfiguration(options.framework);
-    //   case "solid":
-    //     const { solidConfiguration } = await import("./frameworks/solid");
-    //     return solidConfiguration(options.projectPath);
-    //   case "svelte":
-    //     const { svelteConfiguration } = await import("./frameworks/svelte");
-    //     return svelteConfiguration(options.projectPath);
-    //   case "vue":
-    //     const { vueConfiguration } = await import("./frameworks/vue");
-    //     return vueConfiguration(options.projectPath);
-    //   default:
-    //     throw new Error(`Invalid framework type: ${frameworkType}`);
+      return (await import("../frameworks/react.js")).reactConfiguration();
+    case "solid":
+      return (await import("../frameworks/solid.js")).solidConfiguration(
+        options.projectPath
+      );
+    case "svelte":
+      return (await import("../frameworks/svelte.js")).svelteConfiguration(
+        options.projectPath
+      );
+    case "vue":
+      return (await import("../frameworks/vue.js")).vueConfiguration(
+        options.projectPath
+      );
+    default:
+      throw new Error(
+        `Invalid framework type: ${options.framework.type as string}`
+      );
   }
 }
 
@@ -53,7 +56,7 @@ export default async function setupServer(options: Options) {
             setup(build) {
               build.onLoad({ filter: /.*\.js$/ }, async (args) => ({
                 loader: "jsx",
-                contents: await fs.readFile(args.path, "utf8"),
+                contents: await readFile(args.path, "utf8"),
               }));
             },
           },
@@ -68,7 +71,8 @@ export default async function setupServer(options: Options) {
     ...options.vite,
     plugins: [
       ...frameworkConfig.plugins,
-      tsconfigPaths(),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      tsconfigPaths() as vite.PluginOption,
       friendlyTypeImports(),
       {
         name: "virtual",
@@ -81,7 +85,7 @@ export default async function setupServer(options: Options) {
             return await renderCustomContent(layout, options);
           }
           if (id.endsWith(".js")) {
-            const source = await fs.readFile(id, "utf8");
+            const source = await readFile(id, "utf8");
             const transformed = await esbuild.transform(source, {
               loader: "jsx",
               format: "esm",

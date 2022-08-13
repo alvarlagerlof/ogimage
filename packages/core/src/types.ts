@@ -11,6 +11,7 @@ export interface UserConfig {
 
 export interface FrameworkConfiguration {
   packages: string[];
+  defaultImports: boolean;
   plugins: vite.Plugin[];
 }
 

@@ -8,13 +8,13 @@ import capture from "./capture.js";
 import pLimit, { LimitFunction } from "p-limit";
 import step from "./step.js";
 import log from "./log.js";
-import walkPath from "./walk.js";
+import { walkPath } from "./paths.js";
 import { Config } from "./types.js";
 import { Metadata } from "metascraper";
 import extractMeta from "./extractMeta.js";
 import startBrowser from "./browser.js";
 import loadConfig from "./config.js";
-import clearGenerated from "./frameworks/clear.js";
+import clearGenerated from "./clear.js";
 
 interface PathStringWithMetadata {
   pathString: string;
@@ -23,7 +23,7 @@ interface PathStringWithMetadata {
 
 const limit: LimitFunction = pLimit(3);
 
-(async function run() {
+void (async function run() {
   const port = await getPort();
 
   const config = await step<Config>({
@@ -63,7 +63,7 @@ const limit: LimitFunction = pLimit(3);
 
   const pathStrings = await step<string[]>({
     initialMessage: () => `Looking for html files in ${config.buildDir}`,
-    execute: async () => await walkPath(limit, config, config.buildDir),
+    execute: async () => await walkPath(config.buildDir),
     successMessage: (returnValue) => `Found ${returnValue.length} html files`,
     failMessage: () => `Failed to look for html files`,
   });
@@ -72,11 +72,9 @@ const limit: LimitFunction = pLimit(3);
     initialMessage: () => `Adding meta og:image tags...`,
     execute: async () =>
       await Promise.all(
-        pathStrings.map(async (pathString) =>
-          limit(async () => {
-            await addOgImageTag(config, pathString);
-          })
-        )
+        pathStrings.map(async (pathString) => {
+          await addOgImageTag(config, pathString);
+        })
       ),
     successMessage: (returnValue) =>
       `Added meta og:image tags ${returnValue.length} to html files`,
@@ -87,14 +85,10 @@ const limit: LimitFunction = pLimit(3);
     initialMessage: () => `Extracting metadata...`,
     execute: async () =>
       await Promise.all(
-        pathStrings.map(async (pathString) =>
-          limit(async () => {
-            return {
-              pathString: pathString,
-              metadata: await extractMeta(pathString),
-            };
-          })
-        )
+        pathStrings.map(async (pathString) => ({
+          pathString: pathString,
+          metadata: await extractMeta(pathString),
+        }))
       ),
     successMessage: (returnValue) =>
       `Extracted metadata from ${returnValue.length} html`,

@@ -1,16 +1,9 @@
-import * as vite from "vite";
-// import { svgrPlugin } from "../plugins/svgr-plugin";
 import { FrameworkConfiguration } from "../types.js";
 
-export function reactConfiguration(
-  config: {
-    type: "react";
-  },
-  viteConfig?: vite.UserConfig
-): FrameworkConfiguration {
-  const alias = viteConfig?.resolve?.alias;
+export function reactConfiguration(): FrameworkConfiguration {
   return {
     packages: ["react", "react-dom"],
+    defaultImports: false,
     plugins: [
       {
         name: "react",

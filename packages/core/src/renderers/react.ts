@@ -1,15 +1,12 @@
 import { Metadata } from "metascraper";
 import React from "react";
 import ReactDOM from "react-dom";
-import * as vite from "vite";
-
-import { FrameworkConfiguration } from "../types.js";
 
 export async function renderScreenshot(
-  component: React.ComponentType<{}>,
+  component: React.ComponentType,
   meta: Metadata
 ) {
-  const root = document.getElementById("root")!;
+  const root = document.getElementById("root");
 
   if (typeof component !== "function") {
     throw Error("Component is not a function");
@@ -23,8 +20,9 @@ export async function renderScreenshot(
       root
     );
   } catch (e) {
+    const error = e as Error;
     root.innerHTML = `<pre class="viteshot-error">${
-      (e as any).stack || e
+      error.stack || error.toString()
     }</pre>`;
   }
 

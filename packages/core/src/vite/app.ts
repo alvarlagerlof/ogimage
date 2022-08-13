@@ -4,6 +4,8 @@ import connect from "connect";
 export default function setupApp(viteServer: vite.ViteDevServer) {
   const app = connect();
 
+  // TODO: Switch server that supports async
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   app.use(async (req, res, next) => {
     if (req.originalUrl.split("?")[0] !== "/") {
       return next();

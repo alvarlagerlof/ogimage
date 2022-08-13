@@ -12,7 +12,7 @@ export default async function extractMeta(
 ): Promise<Metadata> {
   const content = (await readFile(pathString)).toString();
 
-  const scraper = await metascraper([
+  const scrape = metascraper([
     metascraperTitle(),
     metascraperImage(),
     metascraperDate(),
@@ -20,5 +20,5 @@ export default async function extractMeta(
     metascraperPublisher(),
   ]);
 
-  return await scraper({ url: null, html: content, validateUrl: false });
+  return await scrape({ url: null, html: content, validateUrl: false });
 }

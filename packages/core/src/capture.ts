@@ -15,7 +15,8 @@ export default async function capture(
 
   page.setDefaultTimeout(DEFAULT_TIMEOUT_MILLIS);
 
-  await page.exposeFunction("__meta__", async () => <Metadata>meta);
+  // eslint-disable-next-line @typescript-eslint/require-await
+  await page.exposeFunction("__meta__", async () => meta);
 
   const screenshotPath = path.resolve(
     path.resolve(buildDir, "ogimage"),

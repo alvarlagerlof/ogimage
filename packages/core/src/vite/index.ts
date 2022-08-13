@@ -3,7 +3,7 @@ import * as vite from "vite";
 
 import { FrameworkOptions, WrapperConfig } from "../types.js";
 import setupApp from "./app.js";
-import { getRelativeFilePaths } from "./paths.js";
+import { getRelativeFilePaths } from "../paths.js";
 import setupServer from "./server.js";
 
 export interface Options {
@@ -28,6 +28,6 @@ export default async function startRenderer(options: Options) {
   await new Promise((resolve) => (server = app.listen(options.port, resolve)));
   return async () => {
     await viteServer.close();
-    await server.close();
+    server.close();
   };
 }
