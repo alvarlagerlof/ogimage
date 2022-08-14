@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ES2022",
+    "module": "es2022",
     "moduleResolution": "node16",
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -8,6 +8,11 @@
     "downlevelIteration": true,
     "noEmit": true
   },
-  "include": ["src/**/*", ".eslintrc.cjs", "__tests__/**/*"],
+  "include": [
+    "src/**/*",
+    ".eslintrc.cjs",
+    "jest.config.ts",
+    "src/__tests__/**/*"
+  ],
   "exclude": ["node_modules"]
 }

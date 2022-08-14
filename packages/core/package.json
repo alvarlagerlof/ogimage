@@ -10,7 +10,7 @@
   "scripts": {
     "build": "npx swc ./src -d dist",
     "dev": "yarn build --watch",
-    "test": "jest"
+    "test": "yarn node --experimental-vm-modules --no-warnings $(yarn bin jest) --verbose"
   },
   "bin": "dist/index.js",
   "files": [
