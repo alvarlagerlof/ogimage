@@ -1,4 +1,4 @@
-import * as url from "url";
+import url from "node:url";
 import { promisify } from "util";
 import glob from "glob";
 import { readdir } from "node:fs/promises";
