@@ -4,7 +4,7 @@ import loadConfig from "../config.js";
 import { walkPath } from "../paths.js";
 import { DirectoryItems } from "mock-fs/lib/filesystem.js";
 import loadNodeModules from "./utils/loadNodeModules.js";
-import makeHtml from "./utils/makeHtml.js";
+import { makeHtml } from "./utils/makeHtml.js";
 
 const data = [
   [

@@ -6,6 +6,7 @@ import metascraperImage from "metascraper-image";
 import metascraperDate from "metascraper-date";
 import metascraperDescription from "metascraper-description";
 import metascraperPublisher from "metascraper-publisher";
+import metascraperAuthor from "metascraper-author";
 
 export default async function extractMeta(
   pathString: string
@@ -18,6 +19,7 @@ export default async function extractMeta(
     metascraperDate(),
     metascraperDescription(),
     metascraperPublisher(),
+    metascraperAuthor(),
   ]);
 
   return await scrape({ url: null, html: content, validateUrl: false });

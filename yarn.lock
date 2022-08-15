@@ -4223,6 +4223,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@metascraper/helpers@npm:^5.30.2":
+  version: 5.30.2
+  resolution: "@metascraper/helpers@npm:5.30.2"
+  dependencies:
+    audio-extensions: 0.0.0
+    chrono-node: 2.3.9
+    condense-whitespace: ~2.0.0
+    entities: ~4.3.1
+    file-extension: ~4.0.5
+    has-values: ~2.0.1
+    image-extensions: ~1.1.0
+    is-relative-url: ~3.0.0
+    is-uri: ~1.2.4
+    iso-639-3: ~2.2.0
+    isostring: 0.0.1
+    jsdom: ~20.0.0
+    lodash: ~4.17.21
+    memoize-one: ~6.0.0
+    microsoft-capitalize: ~1.0.5
+    mime: ~3.0.0
+    normalize-url: ~6.1.0
+    re2: ~1.17.7
+    smartquotes: ~2.3.2
+    url-regex-safe: ~3.0.0
+    video-extensions: ~1.2.0
+  checksum: 216ac5745e9de80d0cb52dd51bff51c340a964f3940381f7de666f70bcc02b8e9343005386ad6e589cc79233b5134b9f390e2b7dac84dcbfc26189bb9ca82425
+  languageName: node
+  linkType: hard
+
 "@microsoft/fetch-event-source@npm:2.0.1":
   version: 2.0.1
   resolution: "@microsoft/fetch-event-source@npm:2.0.1"
@@ -17508,6 +17537,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"metascraper-author@npm:^5.30.2":
+  version: 5.30.2
+  resolution: "metascraper-author@npm:5.30.2"
+  dependencies:
+    "@metascraper/helpers": ^5.30.2
+  checksum: 4e53aa6e54e5ada439b85d132a47d6f54bd34fa900c3dda83a5cee46a0dd434aa6ac91dc49812c47e93d66da7e76f6315ff40f0e92ec6e8a5d9ee8b746621010
+  languageName: node
+  linkType: hard
+
 "metascraper-date@npm:^5.29.15":
   version: 5.29.15
   resolution: "metascraper-date@npm:5.29.15"
@@ -17526,12 +17564,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"metascraper-image@npm:^5.29.15":
-  version: 5.29.15
-  resolution: "metascraper-image@npm:5.29.15"
+"metascraper-image@npm:^5.30.2":
+  version: 5.30.2
+  resolution: "metascraper-image@npm:5.30.2"
   dependencies:
-    "@metascraper/helpers": ^5.29.15
-  checksum: d91e99ffeb761877df9bb9fbbccfdd18083860c7a8f08aea246d025ee23471ee2e031cf1c7a4945938c7a9c96d3fe1212decef5b6a8a13bfe9e4f1a41bd85e58
+    "@metascraper/helpers": ^5.30.2
+  checksum: d9264fbcd7c2dc22ed4bc1cb9b3beea34b2b3f9f0ed44bad1e0fb07197e5224bed532dd290f0212ba3a233138913a589f7017562946cb80dcb2cd3bde9302098
   languageName: node
   linkType: hard
 
@@ -17550,6 +17588,15 @@ __metadata:
   dependencies:
     "@metascraper/helpers": ^5.29.15
   checksum: 7084d36332bb0fdbcfd089a04b03b952e9beaa36a13bcf53e5dd7084edad914969e820fb3426c8b4df88cbbc071bf068c5a48ba651840df5701afd7310bdc2c6
+  languageName: node
+  linkType: hard
+
+"metascraper-url@npm:^5.30.2":
+  version: 5.30.2
+  resolution: "metascraper-url@npm:5.30.2"
+  dependencies:
+    "@metascraper/helpers": ^5.30.2
+  checksum: 078a97cbfc7bafd06b04d7c0886021a2aab55d87190ef8409a272493bd975e300036184dbdc5557d7c12c4f8cf3c9704ac9f8d574618bc95839734769316e097
   languageName: node
   linkType: hard
 
@@ -18880,11 +18927,13 @@ __metadata:
     get-port: ^6.1.2
     jest: ^28.1.3
     jest-worker: ^28.1.3
+    metascraper-author: ^5.30.2
     metascraper-date: ^5.29.15
     metascraper-description: ^5.29.15
-    metascraper-image: ^5.29.15
+    metascraper-image: ^5.30.2
     metascraper-publisher: ^5.29.15
     metascraper-title: ^5.29.15
+    metascraper-url: ^5.30.2
     mock-fs: ^5.1.4
     p-limit: ^4.0.0
     puppeteer: ^15.5.0

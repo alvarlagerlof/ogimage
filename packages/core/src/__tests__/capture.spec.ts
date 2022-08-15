@@ -7,7 +7,7 @@ import { readdir } from "node:fs/promises";
 import startBrowser from "../browser.js";
 import capture from "../capture.js";
 import loadNodeModules from "./utils/loadNodeModules.js";
-import makeHtml from "./utils/makeHtml.js";
+import { makeHtml } from "./utils/makeHtml.js";
 import loadConfig from "../config.js";
 import startRenderer from "../vite/index.js";
 import makeDefaultReact from "./utils/makeDefaultReact.js";
