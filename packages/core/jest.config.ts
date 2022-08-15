@@ -4,7 +4,9 @@ import type { Config } from "jest";
 const config: Config = {
   preset: "ts-jest",
   testPathIgnorePatterns: ["__mocks__", "utils"],
-  transform: {},
+  transform: {
+    "^.+\\.(t|j)sx?$": "@swc/jest",
+  },
   extensionsToTreatAsEsm: [".ts"],
   globals: {
     "ts-jest": {
@@ -12,6 +14,8 @@ const config: Config = {
     },
   },
   moduleNameMapper: {
+    // "../frameworks/(.*)": ["<rootDir>/src/frameworks/$1"],
+    // "../frameworks/react.js": ["<rootDir>/src/frameworks/react.ts"],
     "^(\\.{1,2}/.*)\\.js$": "$1",
     chalk: require.resolve("chalk"),
     "#ansi-styles": path.join(

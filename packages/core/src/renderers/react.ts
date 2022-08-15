@@ -12,6 +12,8 @@ export async function renderScreenshot(
     throw Error("Component is not a function");
   }
 
+  console.log("react ran");
+
   root.innerHTML = "";
 
   try {

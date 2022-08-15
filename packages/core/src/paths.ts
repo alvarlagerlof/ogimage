@@ -7,10 +7,6 @@ import path from "node:path";
 import log from "./log.js";
 import { Options } from "./vite/index.js";
 
-export function getRendererDirPath() {
-  return url.fileURLToPath(new URL("./renderers", import.meta.url));
-}
-
 export async function getRelativeFilePaths(
   projectPath: Pick<Options, "projectPath">["projectPath"]
 ) {

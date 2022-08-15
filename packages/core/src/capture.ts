@@ -13,6 +13,22 @@ export default async function capture(
 ) {
   const page = await browser.newPage();
 
+  console.log(url);
+
+  page
+    .on("console", (message) =>
+      console.log(
+        `${message.type().substr(0, 3).toUpperCase()} ${message.text()}`
+      )
+    )
+    .on("pageerror", ({ message }) => console.log(message))
+    .on("response", (response) =>
+      console.log(`${response.status()} ${response.url()}`)
+    )
+    .on("requestfailed", (request) =>
+      console.log(`${request.failure().errorText} ${request.url()}`)
+    );
+
   page.setDefaultTimeout(DEFAULT_TIMEOUT_MILLIS);
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -28,6 +44,7 @@ export default async function capture(
   );
 
   await page.exposeFunction("__takeScreenshot__", async () => {
+    console.log("taking");
     await page.screenshot({
       path: screenshotPath,
     });
@@ -37,6 +54,7 @@ export default async function capture(
   let done!: (errorMessage?: string) => void;
   const donePromise = new Promise<void>((resolve) => {
     done = (receivedErrorMessage) => {
+      console.log("done called");
       if (receivedErrorMessage) {
         errorMessage = receivedErrorMessage;
       }
@@ -48,6 +66,7 @@ export default async function capture(
 
   await page.goto(url);
 
+  // TODO: Why does this not work in jest?
   await donePromise;
 
   if (errorMessage) {

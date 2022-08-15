@@ -1,0 +1,23 @@
+{
+  "hash": "fc27e967",
+  "browserHash": "de98658a",
+  "optimized": {
+    "react": {
+      "src": "../../../../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "a1401d30",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../../../../node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "187e37d3",
+      "needsInterop": true
+    }
+  },
+  "chunks": {
+    "chunk-MQ4HQITF": {
+      "file": "chunk-MQ4HQITF.js"
+    }
+  }
+}

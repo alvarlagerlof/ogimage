@@ -1,9 +1,10 @@
-import path from "path";
-import fs from "fs";
+import path from "node:path";
+import fs from "node:fs";
+import url from "node:url";
 import { readFile } from "fs/promises";
 
 import { Options } from "./index.js";
-import { getRelativeFilePaths, getRendererDirPath } from "../paths.js";
+import { getRelativeFilePaths } from "../paths.js";
 
 async function exists(path: fs.PathLike) {
   try {
@@ -14,12 +15,16 @@ async function exists(path: fs.PathLike) {
   }
 }
 
-export async function renderMainContent() {
-  const rendererDirPath = getRendererDirPath();
+const rendererDirPath = url.fileURLToPath(
+  new URL("../renderers", import.meta.url)
+);
 
-  const extension = (await exists(path.join(rendererDirPath, "main.js")))
-    ? ".js"
-    : ".ts";
+export async function renderMainContent() {
+  // const extension = (await exists(path.join(rendererDirPath, "main.js")))
+  //   ? ".js"
+  //   : ".ts";
+
+  const extension = ".ts";
 
   return await readFile(path.join(rendererDirPath, "main" + extension), "utf8");
 }
@@ -27,8 +32,12 @@ export async function renderMainContent() {
 export async function renderCustomContent(layout: string, options: Options) {
   const relativeFilePaths = await getRelativeFilePaths(options.projectPath);
 
+  // TODO: Find a better way to do this
+  //const extension = typeof jest !== "undefined" ? ".ts" : ".js";
+  const extension = ".ts";
+
   const renderer = await readFile(
-    path.join(getRendererDirPath(), options.framework.type + ".js"),
+    path.join(rendererDirPath, options.framework.type + extension),
     "utf8"
   );
 

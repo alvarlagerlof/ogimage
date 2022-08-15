@@ -1,4 +1,7 @@
 import * as vite from "vite";
+import fs from "node:fs";
+import path from "node:path";
+import url from "node:url";
 import friendlyTypeImports from "rollup-plugin-friendly-type-imports";
 import tsconfigPaths from "vite-tsconfig-paths";
 import * as esbuild from "esbuild";
@@ -8,24 +11,35 @@ import { Options } from "./index.js";
 import { getRelativeFilePaths } from "../paths.js";
 import { renderMainContent, renderCustomContent } from "./content.js";
 
+import { reactConfiguration } from "../frameworks/react.js";
+import { preactConfiguration } from "../frameworks/preact.js";
+import { solidConfiguration } from "../frameworks/solid.js";
+import { svelteConfiguration } from "../frameworks/svelte.js";
+import { vueConfiguration } from "../frameworks/vue.js";
+
 async function getFrameworkConfig(options: Options) {
   switch (options.framework.type) {
     case "preact":
-      return (await import("../frameworks/preact.js")).preactConfiguration();
+      return preactConfiguration();
+    // return (await import("../frameworks/preact.js")).preactConfiguration();
     case "react":
+      //   return reactConfiguration();
       return (await import("../frameworks/react.js")).reactConfiguration();
     case "solid":
-      return (await import("../frameworks/solid.js")).solidConfiguration(
-        options.projectPath
-      );
+      return solidConfiguration(options.projectPath);
+    // return (await import("../frameworks/solid.js")).solidConfiguration(
+    //   options.projectPath
+    // );
     case "svelte":
-      return (await import("../frameworks/svelte.js")).svelteConfiguration(
-        options.projectPath
-      );
+      return svelteConfiguration(options.projectPath);
+    // return (await import("../frameworks/svelte.js")).svelteConfiguration(
+    //   options.projectPath
+    // );
     case "vue":
-      return (await import("../frameworks/vue.js")).vueConfiguration(
-        options.projectPath
-      );
+      return vueConfiguration(options.projectPath);
+    // return (await import("../frameworks/vue.js")).vueConfiguration(
+    //   options.projectPath
+    // );
     default:
       throw new Error(
         `Invalid framework type: ${options.framework.type as string}`
@@ -36,6 +50,8 @@ async function getFrameworkConfig(options: Options) {
 export default async function setupServer(options: Options) {
   const relativeFilePaths = await getRelativeFilePaths(options.projectPath);
   const frameworkConfig = await getFrameworkConfig(options);
+
+  console.log(frameworkConfig);
 
   return await vite.createServer({
     root: options.projectPath,
@@ -62,17 +78,14 @@ export default async function setupServer(options: Options) {
           },
         ],
       },
-      entries: [
-        ...(options.wrapper ? [options.wrapper.path] : []),
-        ...relativeFilePaths,
-      ],
+      entries: [...relativeFilePaths],
       include: [...frameworkConfig.packages],
     },
     ...options.vite,
     plugins: [
       ...frameworkConfig.plugins,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      tsconfigPaths() as vite.PluginOption,
+      // tsconfigPaths() as vite.PluginOption,
       friendlyTypeImports(),
       {
         name: "virtual",

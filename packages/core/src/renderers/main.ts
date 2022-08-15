@@ -2,6 +2,8 @@
 
 import { Metadata } from "metascraper";
 
+console.log("main ran");
+
 declare global {
   interface Window {
     __takeScreenshot__(): Promise<void>;
