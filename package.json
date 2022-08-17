@@ -18,6 +18,7 @@
   "dependencies": {
     "chalk": "^5.0.1",
     "log-symbols": "^5.1.0",
+    "metadata-scraper": "^0.2.58",
     "metascraper": "^5.29.18",
     "playwright": "^1.24.2",
     "rollup-plugin-friendly-type-imports": "^1.0.3",

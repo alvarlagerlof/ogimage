@@ -10728,6 +10728,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"domino@npm:^2.1.6":
+  version: 2.1.6
+  resolution: "domino@npm:2.1.6"
+  checksum: 9b1b6d2661efd8bf942b70d5e11ac0de6a63f17e49b7eb227d9a612fa7b7c12b7775520d64f498988a8ee334ea9c59a463c84ea510b0af17dd3e13fdce120410
+  languageName: node
+  linkType: hard
+
 "domutils@npm:1.5.1":
   version: 1.5.1
   resolution: "domutils@npm:1.5.1"
@@ -13983,7 +13990,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.8.2, got@npm:^11.8.5":
+"got@npm:^11.8.1, got@npm:^11.8.2, got@npm:^11.8.5":
   version: 11.8.5
   resolution: "got@npm:11.8.5"
   dependencies:
@@ -17534,6 +17541,16 @@ __metadata:
     "@types/node":
       optional: true
   checksum: f85f33ea05a0e20598f034696b477924254b742b6d81f77c8bbd7dee1f875656a3d98a1a2a988c481fef7de5c313715ee409b3cb3058ae6c4fe16a7f2fc598a3
+  languageName: node
+  linkType: hard
+
+"metadata-scraper@npm:^0.2.58":
+  version: 0.2.58
+  resolution: "metadata-scraper@npm:0.2.58"
+  dependencies:
+    domino: ^2.1.6
+    got: ^11.8.1
+  checksum: a8a58ef8a80ba1f95a3d1b386626d0b4fb338af4c124482ae632fe988c19bc8ead2feda4d6fa5ce67d10e882b0a114c2bd1d95b924060be98a6a556e4a1abb33
   languageName: node
   linkType: hard
 
@@ -21903,6 +21920,7 @@ __metadata:
   dependencies:
     chalk: ^5.0.1
     log-symbols: ^5.1.0
+    metadata-scraper: ^0.2.58
     metascraper: ^5.29.18
     playwright: ^1.24.2
     rollup-plugin-friendly-type-imports: ^1.0.3
