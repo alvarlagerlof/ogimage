@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import getPort from "get-port";
 import { Browser } from "playwright";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 import startRenderer from "./vite/index.js";
 import addOgImageTag from "./addOgImageTag.js";
@@ -9,8 +11,7 @@ import pLimit, { LimitFunction } from "p-limit";
 import step from "./step.js";
 import log from "./log.js";
 import { walkPath } from "./paths.js";
-import { Config } from "./types.js";
-import { Metadata } from "metascraper";
+import { Config, MetaData } from "./types.js";
 import extractMeta from "./extractMeta.js";
 import startBrowser from "./browser.js";
 import loadConfig from "./config.js";
@@ -18,7 +19,7 @@ import clearGenerated from "./clear.js";
 
 interface PathStringWithMetadata {
   pathString: string;
-  metadata: Metadata;
+  metadata: MetaData;
 }
 
 const limit: LimitFunction = pLimit(3);
@@ -83,13 +84,21 @@ void (async function run() {
 
   const pathStringsWithMetadata = await step<PathStringWithMetadata[]>({
     initialMessage: () => `Extracting metadata...`,
-    execute: async () =>
-      await Promise.all(
-        pathStrings.map(async (pathString) => ({
-          pathString: pathString,
-          metadata: await extractMeta(pathString),
-        }))
-      ),
+    execute: async () => {
+      const html = (
+        await readFile(path.resolve("./build/index.html"))
+      ).toString();
+
+      return await Promise.all(
+        pathStrings.map(
+          async (pathString) =>
+            ({
+              pathString: pathString,
+              metadata: await extractMeta(html),
+            } as PathStringWithMetadata)
+        )
+      );
+    },
     successMessage: (returnValue) =>
       `Extracted metadata from ${returnValue.length} html`,
     failMessage: () => `Failed to extract metadata`,

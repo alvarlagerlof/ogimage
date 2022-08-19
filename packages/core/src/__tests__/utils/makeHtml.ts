@@ -31,7 +31,10 @@ export function makeComplexHtml(
             <meta name="description" content="${description}">
             <meta name="author" content="${author}">
             <meta name="url" content="${url}">
-
+            <meta name="og:title" content="${title}">
+            <meta name="og:description" content="${description}">
+            <meta name="og:author" content="${author}">
+            <meta name="og:url" content="${url}">
         </head>
         <body></body>
         </html>
@@ -45,7 +48,7 @@ export function makeCustomHtml(
   data: unknown
 ) {
   const json = JSON.stringify(data);
-  const buffer = Buffer.from(json, "base64").toString();
+  const buffer = Buffer.from(json, "utf-8").toString("base64");
 
   return `
         <!DOCTYPE html>
@@ -56,8 +59,8 @@ export function makeCustomHtml(
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>${title}</title>
             <meta name="description" content="${description}">
-            <meta name="og:image:layout" content=${layout}>
-            <meta name="og:image:data" content="${buffer}">
+            <meta name="og:image:gen:layout" content=${layout}>
+            <meta name="og:image:gen:data" content="${buffer}">
 
         </head>
         <body></body>

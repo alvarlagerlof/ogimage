@@ -1,35 +1,64 @@
-import { readFile } from "node:fs/promises";
-import getMetaData, { MetaData } from "metadata-scraper";
+import { parse, Document } from "parse5";
 
-export default async function extractMeta(
-  pathString: string
-): Promise<MetaData> {
-  const content = (await readFile(pathString)).toString();
+import { MetaData } from "./types.js";
 
-  return (await getMetaData({
-    html: content,
+function getByTag(document: Document, name: string): Element[] {
+  const results: Element[] = [];
 
-    customRules: {
-      facebook: {
-        rules: [
-          [
-            'meta[property="og:image:layout"][content]',
-            (element) => element.getAttribute("content"),
-          ],
-        ],
-        processor: (text) => text.toLowerCase(),
+  const walk = (childNodes: NodeListOf<ChildNode>) => {
+    childNodes.forEach((node: Element) => {
+      if (node.tagName && node.tagName == name) {
+        results.push(node);
+      }
+
+      if (node.childNodes) {
+        walk(node.childNodes);
+      }
+    });
+  };
+
+  walk(document.childNodes);
+
+  return results;
+}
+
+function getValue(element: Element): string {
+  if (element.childNodes) {
+    return element.childNodes[0].value;
+  }
+}
+
+function getByName(elements: Element[], name: string): string | undefined {
+  const found: Element = elements.find((element: Element) => {
+    if (element.attrs) {
+      return element.attrs[0].value === name;
+    }
+    return false;
+  });
+
+  return found?.attrs[1]?.value;
+}
+
+export default function extractMeta(html: string): MetaData {
+  const parsed = parse(html);
+
+  const title = getByTag(parsed, "title")[0];
+  const meta = getByTag(parsed, "meta");
+
+  return {
+    meta: {
+      title: getValue(title),
+      description: getByName(meta, "description"),
+      author: getByName(meta, "author"),
+      url: getByName(meta, "url"),
+      og: {
+        title: getByName(meta, "og:title"),
+        description: getByName(meta, "og:description"),
+        author: getByName(meta, "og:author"),
+        url: getByName(meta, "og:url"),
       },
     },
-    // customRules: {
-    //   layout: {
-    //     rules: [
-    //       [
-    //         'meta[name="og:image:layout"][content]',
-    //         (element: Element) => element.getAttribute("content"),
-    //       ],
-    //     ],
-    //     processor: (text: string) => text.toLowerCase(),
-    //   },
-    // },
-  })) as MetaData;
+    layout: getByName(meta, "og:image:gen:layout"),
+    data: getByName(meta, "og:image:gen:data"),
+  };
 }

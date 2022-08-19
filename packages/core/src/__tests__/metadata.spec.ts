@@ -1,8 +1,8 @@
 import mock from "mock-fs";
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 
 import extractMeta from "../extractMeta.js";
-import loadNodeModules from "./utils/loadNodeModules.js";
 import { makeComplexHtml, makeCustomHtml, makeHtml } from "./utils/makeHtml.js";
 
 describe("METADATA", () => {
@@ -11,15 +11,18 @@ describe("METADATA", () => {
       build: {
         "index.html": makeHtml("Start page", "Some description"),
       },
-      ...loadNodeModules(),
     });
 
-    const metadata = await extractMeta(path.resolve("./build/index.html"));
+    const html = (
+      await readFile(path.resolve("./build/index.html"))
+    ).toString();
 
-    expect(metadata.title).toBe("Start page");
-    expect(metadata.description).toBe("Some description");
+    const extracted = extractMeta(html);
 
     mock.restore();
+
+    expect(extracted.meta.title).toBe("Start page");
+    expect(extracted.meta.description).toBe("Some description");
   });
 
   test("advanced", async () => {
@@ -32,38 +35,50 @@ describe("METADATA", () => {
           "https://example.com"
         ),
       },
-      ...loadNodeModules(),
     });
 
-    const metadata = await extractMeta(path.resolve("./build/index.html"));
+    const html = (
+      await readFile(path.resolve("./build/index.html"))
+    ).toString();
 
-    expect(metadata.title).toBe("About page");
-    expect(metadata.description).toBe("About us");
-    expect(metadata.author).toBe("A person");
-    expect(metadata.url).toBe("https://example.com");
+    const extracted = extractMeta(html);
 
     mock.restore();
+
+    expect(extracted.meta.title).toBe("About page");
+    expect(extracted.meta.description).toBe("About us");
+    expect(extracted.meta.author).toBe("A person");
+    expect(extracted.meta.url).toBe("https://example.com");
+
+    expect(extracted.meta.og.title).toBe("About page");
+    expect(extracted.meta.og.description).toBe("About us");
+    expect(extracted.meta.og.author).toBe("A person");
+    expect(extracted.meta.og.url).toBe("https://example.com");
   });
 
   test("custom", async () => {
     mock({
       build: {
         "index.html": makeCustomHtml("About page", "About us", "blogpost", {
-          data: "something",
+          foo: "bar",
         }),
       },
-      ...loadNodeModules(),
     });
 
-    const metadata = await extractMeta(path.resolve("./build/index.html"));
+    const html = (
+      await readFile(path.resolve("./build/index.html"))
+    ).toString();
 
-    console.log(metadata);
+    const extracted = extractMeta(html);
 
-    expect(metadata.title).toBe("About page");
-    expect(metadata.description).toBe("About us");
-    expect(metadata.facebook).toBe("blogpost");
-    expect(metadata.data).toBeDefined();
+    const jsonString = Buffer.from(extracted.data, "base64").toString("utf-8");
+    const data: unknown = JSON.parse(jsonString);
 
     mock.restore();
+
+    expect(extracted.meta.title).toBe("About page");
+    expect(extracted.meta.description).toBe("About us");
+    expect(data).toStrictEqual({ foo: "bar" });
+    expect(extracted.layout).toBe("blogpost");
   });
 });

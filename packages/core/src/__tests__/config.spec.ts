@@ -11,24 +11,23 @@ describe("CONFIG", () => {
               "domain": "example.com",
               "layoutsDir": "ogimage-layouts"
           }`,
-      ...loadNodeModules(),
     });
 
     const config = await loadConfig();
 
+    mock.restore();
+
     expect(config.buildDir).toBe("build");
     expect(config.domain).toBe("example.com");
     expect(config.layoutsDir).toBe("ogimage-layouts");
-
-    mock.restore();
   });
 
   test("fail on no config", async () => {
-    mock({ ...loadNodeModules() });
-
-    await expect(async () => await loadConfig()).rejects.toThrow();
+    mock();
 
     mock.restore();
+
+    await expect(async () => await loadConfig()).rejects.toThrow();
   });
 
   test("fail on no incorrect config", async () => {
@@ -37,11 +36,10 @@ describe("CONFIG", () => {
               "buildDir": "build",
               "domain": "example.com",
           }`,
-      ...loadNodeModules(),
     });
 
-    await expect(async () => await loadConfig()).rejects.toThrow();
-
     mock.restore();
+
+    await expect(async () => await loadConfig()).rejects.toThrow();
   });
 });

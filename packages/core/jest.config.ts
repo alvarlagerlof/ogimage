@@ -3,7 +3,7 @@ import type { Config } from "jest";
 
 const config: Config = {
   preset: "ts-jest",
-  testPathIgnorePatterns: ["__mocks__", "utils"],
+  testPathIgnorePatterns: ["__mocks__", "utils", "dist"],
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest",
   },

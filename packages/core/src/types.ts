@@ -9,6 +9,23 @@ export interface UserConfig {
   vite?: vite.UserConfig;
 }
 
+export interface MetaData {
+  meta: {
+    title?: string;
+    description?: string;
+    author?: string;
+    url?: string;
+    og: {
+      title?: string;
+      description?: string;
+      author?: string;
+      url?: string;
+    };
+  };
+  layout: string;
+  data: string;
+}
+
 export interface FrameworkConfiguration {
   packages: string[];
   defaultImports: boolean;
