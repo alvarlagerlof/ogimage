@@ -59,7 +59,7 @@ void (async function run() {
         port: port,
       }),
     successMessage: () => `Started renderer at port: ${port}`,
-    failMessage: () => `Failed to renderer`,
+    failMessage: () => `Failed to start renderer`,
   });
 
   const pathStrings = await step<string[]>({
@@ -119,7 +119,7 @@ void (async function run() {
           successMessage: () => {
             const progress = `(${index + 1} / ${
               pathStringsWithMetadata.length
-            }`;
+            })`;
 
             const file = pathStringWithMetadata.pathString
               .replace(process.cwd(), "")

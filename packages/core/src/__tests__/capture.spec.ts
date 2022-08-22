@@ -11,7 +11,7 @@ import { makeHtml } from "./utils/makeHtml.js";
 import loadConfig from "../config.js";
 import startRenderer from "../vite/index.js";
 import makeDefaultReact from "./utils/makeDefaultReact.js";
-import { Metadata } from "metascraper";
+import { MetaData } from "../types.js";
 
 describe("CAPTURE", () => {
   test(
@@ -35,23 +35,31 @@ describe("CAPTURE", () => {
       const config = await loadConfig();
       const port = await getPort();
       console.log(`http://localhost:${port}`);
+
+      mock.restore();
+
       const stopRenderer = await startRenderer({
         framework: { type: "react" },
         projectPath: `${process.cwd()}/${config.layoutsDir}`,
         port: port,
       });
+
       const pathStringWithMetadata = {
         pathString: url.fileURLToPath(
           new URL("./build/index.html", import.meta.url)
         ),
         metadata: {
-          title: "About us",
-          image: null,
-          date: null,
-          description: "We’re makers of a website",
-          publisher: null,
-        } as Metadata,
+          meta: {
+            title: "About us",
+            image: null,
+            date: null,
+            description: "We’re makers of a website",
+            publisher: null,
+          },
+          layout: "default",
+        } as MetaData,
       };
+
       await capture(
         browser,
         pathStringWithMetadata.pathString,
@@ -59,14 +67,14 @@ describe("CAPTURE", () => {
         pathStringWithMetadata.metadata,
         `http://localhost:${port}/?layout=default`
       );
+
       await browser.close();
       await stopRenderer();
       console.log(await readdir(path.resolve(config.buildDir)));
       const result = await readdir(path.resolve(config.buildDir, "ogimage"));
 
-      mock.restore();
       expect(result.length).toBe(1);
     },
-    15 * 1000
+    40 * 1000
   );
 });

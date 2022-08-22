@@ -15,7 +15,7 @@ export interface MetaData {
     description?: string;
     author?: string;
     url?: string;
-    og: {
+    og?: {
       title?: string;
       description?: string;
       author?: string;
@@ -23,7 +23,7 @@ export interface MetaData {
     };
   };
   layout: string;
-  data: string;
+  data?: string;
 }
 
 export interface FrameworkConfiguration {

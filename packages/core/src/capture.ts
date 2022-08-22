@@ -1,6 +1,6 @@
-import { Metadata } from "metascraper";
 import path from "path";
 import playwright from "playwright";
+import { MetaData } from "./types.js";
 
 const DEFAULT_TIMEOUT_MILLIS = 2 * 60 * 1000;
 
@@ -8,7 +8,7 @@ export default async function capture(
   browser: playwright.Browser,
   pathString: string,
   buildDir: string,
-  meta: Metadata,
+  meta: MetaData,
   url: string
 ) {
   const page = await browser.newPage();

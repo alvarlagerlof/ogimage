@@ -23,7 +23,7 @@ async function getFrameworkConfig(options: Options) {
       return preactConfiguration();
     // return (await import("../frameworks/preact.js")).preactConfiguration();
     case "react":
-      //   return reactConfiguration();
+      // return reactConfiguration();
       return (await import("../frameworks/react.js")).reactConfiguration();
     case "solid":
       return solidConfiguration(options.projectPath);
@@ -62,6 +62,15 @@ export default async function setupServer(options: Options) {
         overlay: false,
       },
     },
+    resolve: {
+      alias: {
+        ".vite/deps": url.fileURLToPath(
+          new URL("./deps_temp", import.meta.url)
+        ),
+        // "@fs/var/home/alvar/Code/alvarlagerlof/ogimage/packages/core/node_modules":
+        //   url.fileURLToPath(new URL("./node_modules", import.meta.url)),
+      },
+    },
     optimizeDeps: {
       esbuildOptions: {
         plugins: [
@@ -85,7 +94,7 @@ export default async function setupServer(options: Options) {
     plugins: [
       ...frameworkConfig.plugins,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      // tsconfigPaths() as vite.PluginOption,
+      tsconfigPaths() as vite.PluginOption,
       friendlyTypeImports(),
       {
         name: "virtual",
@@ -112,4 +121,7 @@ export default async function setupServer(options: Options) {
       ...(options.vite?.plugins || []),
     ],
   });
+}
+function fileURLToPath(arg0: URL): string {
+  throw new Error("Function not implemented.");
 }

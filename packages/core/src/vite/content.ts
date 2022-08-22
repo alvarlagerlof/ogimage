@@ -16,7 +16,7 @@ async function exists(path: fs.PathLike) {
 }
 
 const rendererDirPath = url.fileURLToPath(
-  new URL("../renderers", import.meta.url)
+  new URL("../../dist/renderers", import.meta.url)
 );
 
 export async function renderMainContent() {
@@ -24,7 +24,7 @@ export async function renderMainContent() {
   //   ? ".js"
   //   : ".ts";
 
-  const extension = ".ts";
+  const extension = ".js";
 
   return await readFile(path.join(rendererDirPath, "main" + extension), "utf8");
 }
@@ -34,7 +34,7 @@ export async function renderCustomContent(layout: string, options: Options) {
 
   // TODO: Find a better way to do this
   //const extension = typeof jest !== "undefined" ? ".ts" : ".js";
-  const extension = ".ts";
+  const extension = ".js";
 
   const renderer = await readFile(
     path.join(rendererDirPath, options.framework.type + extension),
