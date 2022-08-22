@@ -34,9 +34,6 @@ describe("CAPTURE", () => {
       });
       const config = await loadConfig();
       const port = await getPort();
-      console.log(`http://localhost:${port}`);
-
-      mock.restore();
 
       const stopRenderer = await startRenderer({
         framework: { type: "react" },
@@ -44,27 +41,26 @@ describe("CAPTURE", () => {
         port: port,
       });
 
-      const pathStringWithMetadata = {
-        pathString: url.fileURLToPath(
-          new URL("./build/index.html", import.meta.url)
-        ),
-        metadata: {
-          meta: {
-            title: "About us",
-            image: null,
-            date: null,
-            description: "We’re makers of a website",
-            publisher: null,
-          },
-          layout: "default",
-        } as MetaData,
+      const pathString = url.fileURLToPath(
+        new URL("./build/index.html", import.meta.url)
+      );
+
+      const metadata: MetaData = {
+        meta: {
+          title: "About us",
+          image: null,
+          date: null,
+          description: "We’re makers of a website",
+          publisher: null,
+        },
+        layout: "default",
       };
 
       await capture(
         browser,
-        pathStringWithMetadata.pathString,
+        pathString,
         config.buildDir,
-        pathStringWithMetadata.metadata,
+        metadata,
         `http://localhost:${port}/?layout=default`
       );
 
@@ -73,8 +69,10 @@ describe("CAPTURE", () => {
       console.log(await readdir(path.resolve(config.buildDir)));
       const result = await readdir(path.resolve(config.buildDir, "ogimage"));
 
+      mock.restore();
+
       expect(result.length).toBe(1);
     },
-    40 * 1000
+    70 * 1000
   );
 });

@@ -1,15 +1,15 @@
 /// <reference types="vite/client" />
 
-import { Metadata } from "metascraper";
-
 console.log("main ran");
+
+import { MetaData } from "../types.js";
 
 declare global {
   interface Window {
     __takeScreenshot__(): Promise<void>;
     __done__(error?: string): Promise<void>;
-    __meta__(): Metadata;
-    meta: Metadata;
+    __meta__(): MetaData;
+    meta: MetaData;
   }
 }
 

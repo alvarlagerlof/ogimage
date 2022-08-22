@@ -51,7 +51,7 @@ export default async function setupServer(options: Options) {
   const relativeFilePaths = await getRelativeFilePaths(options.projectPath);
   const frameworkConfig = await getFrameworkConfig(options);
 
-  console.log(frameworkConfig);
+  // console.log(frameworkConfig);
 
   return await vite.createServer({
     root: options.projectPath,
@@ -61,13 +61,20 @@ export default async function setupServer(options: Options) {
       hmr: {
         overlay: false,
       },
+      // fs: {
+      //   //allow: vite.searchForWorkspaceRoot(process.cwd()),
+      //   // allow: ["../../"],
+      // },
     },
     resolve: {
       alias: {
-        ".vite/deps": url.fileURLToPath(
-          new URL("./deps_temp", import.meta.url)
-        ),
-        // "@fs/var/home/alvar/Code/alvarlagerlof/ogimage/packages/core/node_modules":
+        // react: url.fileURLToPath(
+        //   new URL("../../node_modules/react", import.meta.url)
+        // ),
+        // "react-dom": url.fileURLToPath(
+        //   new URL("../../node_modules/react-dom", import.meta.url)
+        // ),
+        // "/var/home/alvar/Code/alvarlagerlof/ogimage/packages/core/node_modules":
         //   url.fileURLToPath(new URL("./node_modules", import.meta.url)),
       },
     },
@@ -99,8 +106,17 @@ export default async function setupServer(options: Options) {
       {
         name: "virtual",
         load: async (id) => {
+          // console.log({ id });
           if (id === "/__main__.tsx") {
             return await renderMainContent();
+          }
+          if (id.startsWith("/@fs")) {
+            console.log("tried /@fs");
+            return "hello";
+          }
+          if (id.startsWith("/.vite")) {
+            console.log("tried /.vite");
+            return "hello";
           }
           if (id.startsWith("/__renderer__")) {
             const layout = id.replace("/__renderer__", "").replace(".tsx", "");
@@ -121,7 +137,4 @@ export default async function setupServer(options: Options) {
       ...(options.vite?.plugins || []),
     ],
   });
-}
-function fileURLToPath(arg0: URL): string {
-  throw new Error("Function not implemented.");
 }

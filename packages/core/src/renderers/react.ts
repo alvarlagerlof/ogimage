@@ -1,10 +1,11 @@
-import { Metadata } from "metascraper";
 import React from "react";
 import ReactDOM from "react-dom";
 
+import { MetaData } from "../types.js";
+
 export async function renderScreenshot(
   component: React.ComponentType,
-  meta: Metadata
+  meta: MetaData
 ) {
   const root = document.getElementById("root");
 
