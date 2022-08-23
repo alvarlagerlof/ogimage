@@ -1,15 +1,14 @@
-export default function makeDefaultReact() {
+export default function makeDefaultReact(background = "#fff") {
   return `
     export default function Default({
-        title = "No title",
-        description = "No description",
+        meta
       }) {
         return (
-          <>
+          <div style={{ background: "${background}"}}>
             <p>default layout</p>
-            <h1>{title}</h1>
-            <h2>{description}</h2>
-          </>
+            <h1 style={{ fontSize: "11em", margin: "0px" }}>{meta.title}</h1>
+            <h2 style={{ fontSize: "8em", margin: "0px" }}>{meta.description}</h2>
+          </div>
         );
       }
       `;

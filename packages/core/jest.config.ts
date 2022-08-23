@@ -1,9 +1,9 @@
-import path from "node:path";
 import type { Config } from "jest";
+import path from "node:path";
 
 const config: Config = {
   preset: "ts-jest",
-  testPathIgnorePatterns: ["__mocks__", "utils", "dist"],
+  testPathIgnorePatterns: ["utils", "dist"],
   transform: {
     "^.+\\.(t|j)sx?$": "@swc/jest",
   },
@@ -13,6 +13,7 @@ const config: Config = {
       useESM: true,
     },
   },
+  globalSetup: "./jestGlobalSetup.js",
   moduleNameMapper: {
     // "../frameworks/(.*)": ["<rootDir>/src/frameworks/$1"],
     // "../frameworks/react.js": ["<rootDir>/src/frameworks/react.ts"],

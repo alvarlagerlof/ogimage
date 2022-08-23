@@ -8,6 +8,11 @@
     "downlevelIteration": true,
     "noEmit": true
   },
-  "include": ["src/**/*", "jest.config.ts", "src/__tests__/**/*"],
+  "include": [
+    "src/**/*",
+    "jest.config.ts",
+    "src/__tests__/**/*",
+    "jestGlobalSetup.js"
+  ],
   "exclude": ["node_modules"]
 }

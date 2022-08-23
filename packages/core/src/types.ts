@@ -48,6 +48,6 @@ export type Framework = "preact" | "react" | "solid" | "svelte" | "vue";
 
 export interface Config {
   buildDir: string;
-  domain: string;
   layoutsDir: string;
+  domain: string;
 }

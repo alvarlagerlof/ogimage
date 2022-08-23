@@ -1,38 +1,36 @@
-import mock from "mock-fs";
 import getPort from "get-port";
-import url from "node:url";
-import path from "node:path";
+import { spawn } from "node:child_process";
 import { readdir } from "node:fs/promises";
+import path from "node:path";
+import url from "node:url";
 
 import startBrowser from "../browser.js";
 import capture from "../capture.js";
-import loadNodeModules from "./utils/loadNodeModules.js";
-import { makeHtml } from "./utils/makeHtml.js";
-import loadConfig from "../config.js";
-import startRenderer from "../vite/index.js";
-import makeDefaultReact from "./utils/makeDefaultReact.js";
+import { Config } from "../types.js";
 import { MetaData } from "../types.js";
+import startRenderer from "../vite/index.js";
+import { setupTmpDir, writeNestedFile } from "./utils/fsHelper.js";
+import makeDefaultReact from "./utils/makeDefaultReact.js";
 
 describe("CAPTURE", () => {
   test(
     "mocked meta",
     async () => {
-      const browser = await startBrowser();
-      mock({
-        "ogimage.json": `{
-              "buildDir": "build",
-              "domain": "example.com",
-              "layoutsDir": "ogimage-layouts"
-          }`,
-        "ogimage-layouts": {
-          "default.tsx": makeDefaultReact(),
-        },
-        build: {
-          "index.html": makeHtml("Start page", "Some description"),
-        },
-        ...loadNodeModules(),
-      });
-      const config = await loadConfig();
+      await setupTmpDir();
+
+      await writeNestedFile("ogimage-layouts/default.tsx", makeDefaultReact());
+
+      await writeNestedFile(
+        "ogimage-layouts/blogpost.tsx",
+        makeDefaultReact("#FF0000")
+      );
+
+      const config: Config = {
+        buildDir: "build",
+        domain: "https://example.com",
+        layoutsDir: "ogimage-layouts",
+      };
+
       const port = await getPort();
 
       const stopRenderer = await startRenderer({
@@ -48,13 +46,12 @@ describe("CAPTURE", () => {
       const metadata: MetaData = {
         meta: {
           title: "About us",
-          image: null,
-          date: null,
-          description: "We’re makers of a website",
-          publisher: null,
+          description: "We made a website",
         },
         layout: "default",
       };
+
+      const browser = await startBrowser();
 
       await capture(
         browser,
@@ -66,13 +63,10 @@ describe("CAPTURE", () => {
 
       await browser.close();
       await stopRenderer();
-      console.log(await readdir(path.resolve(config.buildDir)));
+
       const result = await readdir(path.resolve(config.buildDir, "ogimage"));
-
-      mock.restore();
-
       expect(result.length).toBe(1);
     },
-    70 * 1000
+    7 * 1000
   );
 });
