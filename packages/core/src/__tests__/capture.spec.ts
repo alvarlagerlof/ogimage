@@ -13,60 +13,116 @@ import { setupTmpDir, writeNestedFile } from "./utils/fsHelper.js";
 import makeDefaultReact from "./utils/makeDefaultReact.js";
 
 describe("CAPTURE", () => {
-  test(
-    "mocked meta",
-    async () => {
-      await setupTmpDir();
+  test("once", async () => {
+    await setupTmpDir();
 
-      await writeNestedFile("ogimage-layouts/default.tsx", makeDefaultReact());
+    await writeNestedFile("ogimage-layouts/default.tsx", makeDefaultReact());
 
-      await writeNestedFile(
-        "ogimage-layouts/blogpost.tsx",
-        makeDefaultReact("#FF0000")
-      );
+    const config: Config = {
+      buildDir: "build",
+      domain: "https://example.com",
+      layoutsDir: "ogimage-layouts",
+    };
 
-      const config: Config = {
-        buildDir: "build",
-        domain: "https://example.com",
-        layoutsDir: "ogimage-layouts",
-      };
+    const port = await getPort();
 
-      const port = await getPort();
+    const stopRenderer = await startRenderer({
+      framework: { type: "react" },
+      projectPath: `${process.cwd()}/${config.layoutsDir}`,
+      port: port,
+    });
 
-      const stopRenderer = await startRenderer({
-        framework: { type: "react" },
-        projectPath: `${process.cwd()}/${config.layoutsDir}`,
-        port: port,
-      });
+    const pathString = url.fileURLToPath(
+      new URL("./build/index.html", import.meta.url)
+    );
 
-      const pathString = url.fileURLToPath(
-        new URL("./build/index.html", import.meta.url)
-      );
+    const metadata: MetaData = {
+      meta: {
+        title: "About us",
+        description: "We made a website",
+      },
+      layout: "default",
+    };
 
-      const metadata: MetaData = {
-        meta: {
-          title: "About us",
-          description: "We made a website",
-        },
-        layout: "default",
-      };
+    const browser = await startBrowser();
 
-      const browser = await startBrowser();
+    await capture(
+      browser,
+      pathString,
+      config.buildDir,
+      metadata,
+      `http://localhost:${port}/?layout=default`
+    );
 
-      await capture(
-        browser,
-        pathString,
-        config.buildDir,
-        metadata,
-        `http://localhost:${port}/?layout=default`
-      );
+    await browser.close();
+    await stopRenderer();
 
-      await browser.close();
-      await stopRenderer();
+    const result = await readdir(path.resolve(config.buildDir, "ogimage"));
+    expect(result.length).toBe(1);
+  });
 
-      const result = await readdir(path.resolve(config.buildDir, "ogimage"));
-      expect(result.length).toBe(1);
-    },
-    7 * 1000
-  );
+  test("once", async () => {
+    await setupTmpDir();
+
+    await writeNestedFile("ogimage-layouts/default.tsx", makeDefaultReact());
+
+    await writeNestedFile(
+      "ogimage-layouts/blogpost.tsx",
+      makeDefaultReact("#EAFF00")
+    );
+
+    const config: Config = {
+      buildDir: "build",
+      domain: "https://example.com",
+      layoutsDir: "ogimage-layouts",
+    };
+
+    const port = await getPort();
+
+    const stopRenderer = await startRenderer({
+      framework: { type: "react" },
+      projectPath: `${process.cwd()}/${config.layoutsDir}`,
+      port: port,
+    });
+
+    const pathString = url.fileURLToPath(
+      new URL("./build/index.html", import.meta.url)
+    );
+
+    const pathString2 = url.fileURLToPath(
+      new URL("./build/index.html", import.meta.url)
+    );
+
+    const metadata: MetaData = {
+      meta: {
+        title: "About us",
+        description: "We made a website",
+      },
+      layout: "default",
+    };
+
+    const browser = await startBrowser();
+
+    await capture(
+      browser,
+      pathString,
+      config.buildDir,
+      metadata,
+      `http://localhost:${port}/?layout=default`
+    );
+
+    await capture(
+      browser,
+      pathString2,
+      config.buildDir,
+      metadata,
+      `http://localhost:${port}/?layout=blogpostx`
+    );
+
+    await browser.close();
+    await stopRenderer();
+
+    const result = await readdir(path.resolve(config.buildDir, "ogimage"));
+    expect(result.length).toBe(1);
+  });
 });
