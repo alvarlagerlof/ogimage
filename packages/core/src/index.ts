@@ -127,7 +127,9 @@ void (async function run() {
               screenshotPathsWithMetadata.length
             })`;
 
-            return `${progress} Captured ${screenshotPathWithMetadata.screenshotPath}`;
+            return `${progress} Captured ${screenshotPathWithMetadata.screenshotPath
+              .replace(process.cwd(), "")
+              .substring(1)}`;
           },
           failMessage: () => `Failed to add meta og:image tags`,
         });
