@@ -1,28 +1,29 @@
 #!/usr/bin/env node
 import getPort from "get-port";
-import { Browser } from "playwright";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-
-import startRenderer from "./vite/index.js";
-import addOgImageTag from "./addOgImageTag.js";
-import capture from "./capture.js";
+import url from "node:url";
 import pLimit, { LimitFunction } from "p-limit";
-import step from "./step.js";
+import { Browser } from "playwright";
+
+import addOgImageTag from "./addOgImageTag.js";
+import startBrowser from "./browser.js";
+import capture from "./capture.js";
+import clearGenerated from "./clear.js";
+import loadConfig from "./config.js";
+import extractMeta from "./extractMeta.js";
 import log from "./log.js";
 import { walkPath } from "./paths.js";
+import step from "./step.js";
 import { Config, MetaData } from "./types.js";
-import extractMeta from "./extractMeta.js";
-import startBrowser from "./browser.js";
-import loadConfig from "./config.js";
-import clearGenerated from "./clear.js";
+import startRenderer from "./vite/index.js";
 
 interface PathStringWithMetadata {
-  pathString: string;
+  screenshotPath: string;
   metadata: MetaData;
 }
 
-const limit: LimitFunction = pLimit(3);
+const limit: LimitFunction = pLimit(4);
 
 void (async function run() {
   const port = await getPort();
@@ -82,21 +83,24 @@ void (async function run() {
     failMessage: () => `Failed to add meta og:image tags`,
   });
 
-  const pathStringsWithMetadata = await step<PathStringWithMetadata[]>({
+  const screenshotPathsWithMetadata = await step<PathStringWithMetadata[]>({
     initialMessage: () => `Extracting metadata...`,
     execute: async () => {
-      const html = (
-        await readFile(path.resolve("./build/index.html"))
-      ).toString();
-
       return await Promise.all(
-        pathStrings.map(
-          async (pathString) =>
-            ({
-              pathString: pathString,
-              metadata: await extractMeta(html),
-            } as PathStringWithMetadata)
-        )
+        pathStrings.map(async (pathString) => {
+          const html = (await readFile(path.resolve(pathString))).toString();
+
+          const file = pathString
+            .split(`/${config.buildDir}/`)[1]
+            .replace(".html", ".jpg");
+
+          const screenshotPath = path.resolve(config.buildDir, "ogimage", file);
+
+          return {
+            screenshotPath,
+            metadata: extractMeta(html),
+          } as PathStringWithMetadata;
+        })
       );
     },
     successMessage: (returnValue) =>
@@ -105,27 +109,25 @@ void (async function run() {
   });
 
   await Promise.all(
-    pathStringsWithMetadata.map(async (pathStringWithMetadata, index) =>
+    screenshotPathsWithMetadata.map(async (screenshotPathWithMetadata, index) =>
       limit(async () => {
         await step({
-          execute: async () =>
-            await capture(
-              browser,
-              pathStringWithMetadata.pathString,
-              config.buildDir,
-              pathStringWithMetadata.metadata,
-              `http://localhost:${port}/?layout=default`
-            ),
+          execute: async () => {
+            const { screenshotPath, metadata } = screenshotPathWithMetadata;
+
+            const page = await browser.newPage();
+            const pageUrl = `http://localhost:${port}/?layout=default`;
+
+            await capture(page, pageUrl, metadata, screenshotPath);
+            await page.close();
+          },
+
           successMessage: () => {
             const progress = `(${index + 1} / ${
-              pathStringsWithMetadata.length
+              screenshotPathsWithMetadata.length
             })`;
 
-            const file = pathStringWithMetadata.pathString
-              .replace(process.cwd(), "")
-              .substring(1);
-
-            return `${progress} Captured for ${file}`;
+            return `${progress} Captured ${screenshotPathWithMetadata.screenshotPath}`;
           },
           failMessage: () => `Failed to add meta og:image tags`,
         });
@@ -133,7 +135,7 @@ void (async function run() {
     )
   );
 
-  log.success(`Captured for ${pathStringsWithMetadata.length} pages`);
+  log.success(`Captured for ${screenshotPathsWithMetadata.length} pages`);
 
   await step({
     initialMessage: () => `Stopping browser...`,

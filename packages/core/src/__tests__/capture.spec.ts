@@ -1,5 +1,4 @@
 import getPort from "get-port";
-import { spawn } from "node:child_process";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import url from "node:url";
@@ -32,9 +31,10 @@ describe("CAPTURE", () => {
       port: port,
     });
 
-    const pathString = url.fileURLToPath(
-      new URL("./build/index.html", import.meta.url)
-    );
+    const browser = await startBrowser();
+    const page = await browser.newPage();
+
+    const pageUrl = `http://localhost:${port}/?layout=default`;
 
     const metadata: MetaData = {
       meta: {
@@ -44,16 +44,19 @@ describe("CAPTURE", () => {
       layout: "default",
     };
 
-    const browser = await startBrowser();
+    const pathString = url
+      .fileURLToPath(new URL("./build/index.html", import.meta.url))
+      .toString();
 
-    await capture(
-      browser,
-      pathString,
-      config.buildDir,
-      metadata,
-      `http://localhost:${port}/?layout=default`
-    );
+    const file = pathString
+      .split(`/${config.buildDir}/`)[1]
+      .replace(".html", ".jpg");
 
+    const screenshotPath = path.resolve(config.buildDir, "ogimage", file);
+
+    await capture(page, pageUrl, metadata, screenshotPath);
+
+    await page.close();
     await browser.close();
     await stopRenderer();
 

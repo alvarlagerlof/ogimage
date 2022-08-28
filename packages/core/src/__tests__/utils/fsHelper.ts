@@ -6,8 +6,11 @@ import { v4 as uuid } from "uuid";
 
 export async function setupTmpDir() {
   try {
+    const currentDir = url.fileURLToPath(new URL(".", import.meta.url));
     const id = uuid();
-    const directory = path.join(".", ".tmp-jest", id);
+    const directory = path.join(currentDir, ".tmp-jest", id);
+
+    // console.log(directory);
 
     await mkdir(directory, { recursive: true });
 

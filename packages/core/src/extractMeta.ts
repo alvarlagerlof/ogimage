@@ -1,8 +1,8 @@
-import { parse, Document } from "parse5";
+import { parse } from "parse5";
 
 import { MetaData } from "./types.js";
 
-function getByTag(document: Document, name: string): Element[] {
+function getByTag(document: Documentt, name: string): Element[] {
   const results: Element[] = [];
 
   const walk = (childNodes: NodeListOf<ChildNode>) => {
